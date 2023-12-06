@@ -1,5 +1,6 @@
 from root_app.configuracoes.home.funcoes import *
 from flet import *
+import ast
 
 
 convenios = listar_convenios()
@@ -134,9 +135,14 @@ class Home(UserControl):
 
         )
 
+        def botao_selecionado(botao: ControlEvent):
+            botao_string = str(botao.control)[9:]
+            botao_dicionario = ast.literal_eval(botao_string)
+            print(botao_dicionario['key'])
+
         for i in range(0, 100):
             cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
-                                on_click=lambda _: self.page.go('/cliente', ))
+                                on_click=lambda i=i: botao_selecionado(i))
             coluna_de_pesquisados.controls.append(cliente)
 
         container_de_titulo = Container(
@@ -160,7 +166,8 @@ class Home(UserControl):
             border_radius=10,
             padding=padding.only(top=20, left=10,
                                  bottom=20),
-            content=coluna_de_pesquisados
+            content=coluna_de_pesquisados,
+
         )
 
         return Column(
