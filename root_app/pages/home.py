@@ -131,7 +131,8 @@ class Home(UserControl):
             height=200,
             width=float("inf"),
             scroll=ScrollMode.ALWAYS,
-            alignment=MainAxisAlignment.CENTER
+            alignment=MainAxisAlignment.CENTER,
+            auto_scroll=True
 
         )
 
@@ -140,10 +141,14 @@ class Home(UserControl):
             botao_dicionario = ast.literal_eval(botao_string)
             print(botao_dicionario['key'])
 
-        for i in range(0, 100):
-            cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
-                                on_click=lambda i=i: botao_selecionado(i))
-            coluna_de_pesquisados.controls.append(cliente)
+
+        def lista_de_consulta(e):
+            coluna_de_pesquisados.controls.clear()
+            for i in range(0, 20):
+                cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
+                                    on_click=lambda i=i: botao_selecionado(i))
+                coluna_de_pesquisados.controls.append(cliente)
+                self.update()
 
         container_de_titulo = Container(
             bgcolor='#363636',
@@ -156,7 +161,8 @@ class Home(UserControl):
                 ],
             ),
             padding=padding.only(top=20, left=10, right=10,
-                                 bottom=20)
+                                 bottom=20),
+
         )
 
         container_de_dados = Container(
@@ -167,6 +173,8 @@ class Home(UserControl):
             padding=padding.only(top=20, left=10,
                                  bottom=20),
             content=coluna_de_pesquisados,
+            on_hover=lista_de_consulta,
+
 
         )
 
