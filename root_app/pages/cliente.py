@@ -2,18 +2,27 @@ import ast
 
 from flet import *
 
+# from root_app.shared.database import SessionLocal
+# from root_app.configuracoes.home.models import Selecionado
+#
+# sessao = SessionLocal()
+
 
 class Cliente(UserControl):
-
     def __init__(self, page):
         super().__init__()
         self.page = page
+        # self.sessao = sessao
 
     def eventosbar(self, e: ControlEvent):
         botao_string = str(e.control)[13:]
         botao_dicionario = ast.literal_eval(botao_string)
         if int(botao_dicionario['selectedindex']) == 0:
             self.page.go('/home')
+
+    # def buscar_cliente(self):
+    #     cliente = self.sessao.query(Selecionado).first()
+    #     print(cliente.matricula)
 
     def build(self):
         navigation_bar = NavigationBar(

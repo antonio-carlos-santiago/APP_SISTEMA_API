@@ -33,7 +33,7 @@ def main(page: Page):
             page.update()
 
     page.on_route_change = router_change
-    page.go('/home')
+    page.go('/login')
 
 
 app(target=main)

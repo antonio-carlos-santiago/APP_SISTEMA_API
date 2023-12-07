@@ -1,4 +1,3 @@
-import ast
 import json
 
 import requests
@@ -70,6 +69,7 @@ def verifica_sessoes(convenios):
 
 
 def salvar_dados_retornados(dados):
+    print('chegou aqui')
     for dados_linha in dados:
         print(dados_linha)
         print()
@@ -111,31 +111,6 @@ def salvar_matricula(cpf: str, matricula: str):
         cliente = sessao.query(Cliente).filter_by(cpf=cpf).first()
         nova_matricula = Matricula(matricula=matricula, cliente_responsavel_id=int(cliente.id_cliente))
         sessao.add(nova_matricula)
-        sessao.commit()
-
-
-def salvar_emprestimos(dados):
-    matricula = sessao.query(Matricula).filter_by(matricula=dados['dados_cliente']['matricula']).first()
-    id_cliente = matricula.cliente_responsavel_id
-    id_matricula = matricula.id_matricula
-    lista_emprestimos = dados['dados_emprestimos']
-    for emprestimo in lista_emprestimos:
-        linha_emprestimo = Emprestimo(
-            margem_emprestimo=dados['dados_margens'][0]['Margem 35% Empréstimos e Outros']['margem_atual'],
-            margem_cartao=dados['dados_margens'][1]['Margem 5% Cartão']['margem_atual'],
-            mes_referencia=dados['dados_cliente']['mes_referencia'],
-            ade=emprestimo['ade'],
-            deferido=emprestimo['data_deferimento'],
-            servico=emprestimo['servicos'],
-            consignataria=emprestimo['consignataria'],
-            pagas=emprestimo['parcela_atual'],
-            total=emprestimo['parcela_total'],
-            valor=emprestimo['valor'],
-            status=emprestimo['status'],
-            cliente_responsavel_id=id_cliente,
-            matricula_responsavel_id=id_matricula
-        )
-        sessao.add(linha_emprestimo)
         sessao.commit()
 
 
