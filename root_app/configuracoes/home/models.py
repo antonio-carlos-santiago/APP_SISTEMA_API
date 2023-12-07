@@ -58,9 +58,10 @@ class Consulta(Base):
     cpf = Column(String, nullable=False)
     matricula = Column(String, nullable=False)
     convenio = Column(String, nullable=False)
+    nome = Column(String, nullable=False)
 
 
 class Selecionado(Base):
     __tablename__ = 'selecionados'
     id_selecionado = Column(Integer(), primary_key=True, autoincrement=True)
-    cpf = Column(String, nullable=False)
+    matricula = Column(String, nullable=False)

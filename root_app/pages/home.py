@@ -2,10 +2,6 @@ from root_app.configuracoes.home.funcoes import *
 from flet import *
 import ast
 
-
-
-
-
 convenios = listar_convenios()
 lista_de_funcoes = verifica_sessoes(convenios)
 elementos = Column(lista_de_funcoes, alignment=MainAxisAlignment.CENTER)
@@ -143,19 +139,23 @@ class Home(UserControl):
         def botao_selecionado(botao: ControlEvent):
             botao_string = str(botao.control)[9:]
             botao_dicionario = ast.literal_eval(botao_string)
-            print(botao_dicionario['key'])
+            buscar_selecionado(botao_dicionario['key'])
+            self.page.go('/cliente')
+
 
 
         def lista_de_consulta(e):
             coluna_de_pesquisados.controls.clear()
-            # todas_as_consultas = sessao.query(Consulta).all()
-            # if todas_as_consultas:
-            #     for emprestimo in todas_as_consultas:
-            #         print(emprestimo)
-                # cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
-                #                     on_click=lambda i=i: botao_selecionado(i))
-                # coluna_de_pesquisados.controls.append(cliente)
-                # self.update()
+            todas_as_consultas = consultas_diarias_realizadas()
+            if todas_as_consultas:
+                for emprestimo in todas_as_consultas:
+                    if emprestimo.data_consulta == datetime.utcnow().date():
+                        matricula = emprestimo.matricula
+                        cliente = Container(bgcolor='red', width=460, key=str(matricula), content=
+                        Text(value=f'Cliente: {emprestimo.nome[:15]} Matricula: {matricula} CPF: {emprestimo.cpf}'),
+                                            on_click=lambda matricula=matricula: botao_selecionado(matricula))
+                        coluna_de_pesquisados.controls.append(cliente)
+            self.update()
 
         container_de_titulo = Container(
             bgcolor='#363636',
@@ -181,7 +181,6 @@ class Home(UserControl):
                                  bottom=20),
             content=coluna_de_pesquisados,
             on_hover=lista_de_consulta,
-
 
         )
 

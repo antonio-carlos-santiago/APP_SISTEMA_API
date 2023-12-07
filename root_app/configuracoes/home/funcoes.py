@@ -1,3 +1,4 @@
+import ast
 import json
 
 import requests
@@ -70,7 +71,6 @@ def verifica_sessoes(convenios):
 
 def salvar_dados_retornados(dados):
     for dados_linha in dados:
-        print(dados_linha)
         salva_cliente(
             cpf=dados_linha['dados_cliente']['cpf'],
             nome=dados_linha['dados_cliente']['nome']
@@ -83,7 +83,8 @@ def salvar_dados_retornados(dados):
         registrar_consulta_diaria(
             cpf=dados_linha['dados_cliente']['cpf'],
             matricula=dados_linha['dados_cliente']['matricula'],
-            convenio=dados_linha['consignataria']['convenio']
+            convenio=dados_linha['consignataria']['convenio'],
+            nome=dados_linha['dados_cliente']['nome']
         )
 
 
@@ -108,7 +109,6 @@ def salvar_matricula(cpf: str, matricula: str):
 
 
 def salvar_emprestimos(dados):
-
     matricula = sessao.query(Matricula).filter_by(matricula=dados['dados_cliente']['matricula']).first()
     id_cliente = matricula.cliente_responsavel_id
     id_matricula = matricula.id_matricula
@@ -133,11 +133,30 @@ def salvar_emprestimos(dados):
         sessao.commit()
 
 
-def registrar_consulta_diaria(cpf, matricula, convenio):
+def registrar_consulta_diaria(cpf, matricula, convenio, nome):
     nova_consulta = Consulta(
         cpf=cpf,
         matricula=matricula,
-        convenio=convenio
+        convenio=convenio,
+        nome=nome
     )
     sessao.add(nova_consulta)
     sessao.commit()
+
+
+def consultas_diarias_realizadas():
+    todas_as_consultas = sessao.query(Consulta).all()
+    return todas_as_consultas
+
+
+def buscar_selecionado(matricula):
+    matricula_registrada = sessao.query(Selecionado).first()
+    if not matricula_registrada:
+        nova_matricula = Selecionado(matricula=matricula)
+        sessao.add(nova_matricula)
+        sessao.commit()
+    else:
+        matricula_registrada.matricula = matricula
+        sessao.commit()
+
+
