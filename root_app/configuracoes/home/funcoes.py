@@ -71,6 +71,8 @@ def verifica_sessoes(convenios):
 
 def salvar_dados_retornados(dados):
     for dados_linha in dados:
+        print(dados_linha)
+        print()
         salva_cliente(
             cpf=dados_linha['dados_cliente']['cpf'],
             nome=dados_linha['dados_cliente']['nome']
@@ -79,12 +81,16 @@ def salvar_dados_retornados(dados):
             cpf=dados_linha['dados_cliente']['cpf'],
             matricula=dados_linha['dados_cliente']['matricula']
         )
-        salvar_emprestimos(dados_linha)
         registrar_consulta_diaria(
             cpf=dados_linha['dados_cliente']['cpf'],
             matricula=dados_linha['dados_cliente']['matricula'],
             convenio=dados_linha['dados_consulta']['convenio'],
-            nome=dados_linha['dados_cliente']['nome']
+            nome=dados_linha['dados_cliente']['nome'],
+            margem_emprestimo=dados_linha['dados_margens'][0]['Margem 35% Empréstimos e Outros']['margem_atual'],
+            margem_cartao=dados_linha['dados_margens'][1]['Margem 5% Cartão']['margem_atual'],
+            mes_referencia=dados_linha['dados_cliente']['mes_referencia'],
+            emprestimos=dados_linha['dados_emprestimos'],
+            cartoes=dados_linha['dados_cartoes']
         )
 
 
@@ -133,12 +139,19 @@ def salvar_emprestimos(dados):
         sessao.commit()
 
 
-def registrar_consulta_diaria(cpf, matricula, convenio, nome):
+def registrar_consulta_diaria(cpf, matricula, convenio, nome, margem_emprestimo,
+                              margem_cartao, mes_referencia, emprestimos, cartoes):
+
     nova_consulta = Consulta(
         cpf=cpf,
         matricula=matricula,
         convenio=convenio,
-        nome=nome
+        nome=nome,
+        margem_emprestimo=margem_emprestimo,
+        margem_cartao=margem_cartao,
+        mes_referencia=mes_referencia,
+        emprestimos=emprestimos,
+        cartoes=cartoes
     )
     sessao.add(nova_consulta)
     sessao.commit()
