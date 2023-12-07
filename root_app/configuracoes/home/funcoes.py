@@ -83,7 +83,7 @@ def salvar_dados_retornados(dados):
         registrar_consulta_diaria(
             cpf=dados_linha['dados_cliente']['cpf'],
             matricula=dados_linha['dados_cliente']['matricula'],
-            convenio=dados_linha['consignataria']['convenio'],
+            convenio=dados_linha['dados_consulta']['convenio'],
             nome=dados_linha['dados_cliente']['nome']
         )
 
