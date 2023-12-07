@@ -47,7 +47,7 @@ class Emprestimo(Base):
     cliente_responsavel_id = Column(Integer, ForeignKey('clientes.id_cliente'))
     matricula_responsavel = relationship('Matricula', back_populates='emprestimo_relacionado')
     matricula_responsavel_id = Column(Integer, ForeignKey('matriculas.id_matricula'))
-    consulta_relacionado = relationship('Consulta', back_populates='emprestimo_responsavel')
+
 
 
 class Consulta(Base):
@@ -55,5 +55,12 @@ class Consulta(Base):
 
     id_consulta = Column(Integer(), autoincrement=True, primary_key=True)
     data_consulta = Column(Date, default=datetime.utcnow)
-    emprestimo_responsavel = relationship('Emprestimo', back_populates='consulta_relacionado')
-    emprestimo_responsavel_id = Column(Integer, ForeignKey('emprestimos.id_emprestimo'))
+    cpf = Column(String, nullable=False)
+    matricula = Column(String, nullable=False)
+    convenio = Column(String, nullable=False)
+
+
+class Selecionado(Base):
+    __tablename__ = 'selecionados'
+    id_selecionado = Column(Integer(), primary_key=True, autoincrement=True)
+    cpf = Column(String, nullable=False)

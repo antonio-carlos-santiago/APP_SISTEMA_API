@@ -3,6 +3,9 @@ from flet import *
 import ast
 
 
+
+
+
 convenios = listar_convenios()
 lista_de_funcoes = verifica_sessoes(convenios)
 elementos = Column(lista_de_funcoes, alignment=MainAxisAlignment.CENTER)
@@ -30,6 +33,7 @@ class Home(UserControl):
                         mensagens_de_avisos.value = resultado['info']
                         self.update()
                 else:
+                    salvar_dados_retornados(resultado)
                     mensagens_de_avisos.value = 'Cliente consultado'
                     self.update()
 
@@ -144,11 +148,14 @@ class Home(UserControl):
 
         def lista_de_consulta(e):
             coluna_de_pesquisados.controls.clear()
-            for i in range(0, 20):
-                cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
-                                    on_click=lambda i=i: botao_selecionado(i))
-                coluna_de_pesquisados.controls.append(cliente)
-                self.update()
+            # todas_as_consultas = sessao.query(Consulta).all()
+            # if todas_as_consultas:
+            #     for emprestimo in todas_as_consultas:
+            #         print(emprestimo)
+                # cliente = Container(bgcolor='red', width=460, key=str(i), content=Text(value=f'Pesquisa {i}'),
+                #                     on_click=lambda i=i: botao_selecionado(i))
+                # coluna_de_pesquisados.controls.append(cliente)
+                # self.update()
 
         container_de_titulo = Container(
             bgcolor='#363636',
