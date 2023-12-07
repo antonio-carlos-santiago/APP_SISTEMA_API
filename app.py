@@ -27,13 +27,13 @@ def main(page: Page):
 
         elif page.route == '/cliente':
             page.window_width = 1050
-            page.window_height = 800
+            page.window_height = 760
             page.theme_mode = ThemeMode.DARK
             page.title = 'Cliente'
             page.update()
 
     page.on_route_change = router_change
-    page.go('/home')
+    page.go('/login')
 
 
 app(target=main)

@@ -8,24 +8,10 @@ from root_app.configuracoes.cliente.funcoes import *
 class Cliente(UserControl):
     def __init__(self, page):
         super().__init__()
+        self.radio = None
+        self.conteiner_emprestimos = None
         self.page = page
         self.dados_cliente = buscar_cliente()
-        self.tipo_de_busca = self.tipo_radio()
-
-    def radio_click(self, e):
-        print('ta chegando')
-
-
-    def tipo_radio(self):
-        radio_elemento = RadioGroup(
-            on_change=self.radio_click,
-            value='Emprestimo',
-            content=Row([
-                Radio(value='Emprestimo', label='Emprestimo'),
-                Radio(value='Cartão', label='Cartão')
-            ])
-        )
-        return radio_elemento
 
     def eventosbar(self, e: ControlEvent):
         botao_string = str(e.control)[13:]
@@ -40,6 +26,13 @@ class Cliente(UserControl):
         self.update()
 
     def elementos_dados_cliente(self):
+        self.radio = RadioGroup(
+            on_change=self.elementos_linhas_emprestimo,
+            content=Row([
+                Radio(value='Emprestimo', label="Emprestimo"),
+                Radio(value="Cartao", label='Cartao')
+            ])
+        )
 
         dados_cliente = Column([
             Container(
@@ -96,7 +89,7 @@ class Cliente(UserControl):
                 width=320
             ),
             Container(
-                content=Row([Text('Exibir contratos: '), self.tipo_de_busca]),
+                content=Row([Text('Exibir contratos: '), self.radio]),
                 width=320,
             ),
         ])
@@ -107,9 +100,10 @@ class Cliente(UserControl):
             alignment=MainAxisAlignment.SPACE_AROUND
         )
 
-    def elementos_linhas_emprestimo(self):
-        busca = None
-        if self.tipo_de_busca.value == "Emprestimo":
+    def elementos_linhas_emprestimo(self, e):
+        self.conteiner_emprestimos.visible = True
+        self.window_height = 700
+        if self.radio.value == "Emprestimo":
             busca = self.dados_cliente.emprestimos
         else:
             busca = self.dados_cliente.cartoes
@@ -151,8 +145,8 @@ class Cliente(UserControl):
 
         )
         scrool.controls.append(lista_de_emprestimos)
-
-        return scrool
+        self.conteiner_emprestimos.content = scrool
+        self.update()
 
     def build(self):
         navigation_bar = NavigationBar(
@@ -173,19 +167,21 @@ class Cliente(UserControl):
             padding=padding.only(right=20, left=20, top=5)
         )
 
-        conteiner_emprestimos = Container(
+        self.conteiner_emprestimos = Container(
             bgcolor='#363636',
             width=1050,
             height=400,
             border_radius=10,
-            content=self.elementos_linhas_emprestimo(),
-            padding=padding.only(bottom=20)
+            padding=padding.only(bottom=20),
+            content=Row([Text('Selecione uma das opçoes acima para exibir os contratos', size=30)],
+                        alignment=MainAxisAlignment.CENTER)
+
         )
 
         return Column(
             [
                 navigation_bar,
                 conteiner_dados,
-                conteiner_emprestimos,
+                self.conteiner_emprestimos
             ]
         )
