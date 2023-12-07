@@ -8,7 +8,6 @@ def main(page: Page):
     page.window_maximizable = False
     page.update()
 
-
     def router_change(route):
         page.views.clear()
         page.views.append(
@@ -31,6 +30,12 @@ def main(page: Page):
             page.theme_mode = ThemeMode.DARK
             page.title = 'Cliente'
             page.update()
+
+        elif page.route == '/detalhes':
+            page.window_width = 1050
+            page.window_height = 760
+            page.theme_mode = ThemeMode.DARK
+            page.title = 'Detalhes'
 
     page.on_route_change = router_change
     page.go('/login')

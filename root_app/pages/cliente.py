@@ -19,7 +19,7 @@ class Cliente(UserControl):
         if int(botao_dicionario['selectedindex']) == 0:
             self.page.go('/home')
         elif int(botao_dicionario['selectedindex']) == 1:
-            pass
+            self.page.go('/detalhes')
 
     def copia_dados(self, objeto: ControlEvent):
         print(objeto.__dict__)
@@ -101,8 +101,6 @@ class Cliente(UserControl):
         )
 
     def elementos_linhas_emprestimo(self, e):
-        self.conteiner_emprestimos.visible = True
-        self.window_height = 700
         if self.radio.value == "Emprestimo":
             busca = self.dados_cliente.emprestimos
         else:
@@ -175,7 +173,6 @@ class Cliente(UserControl):
             padding=padding.only(bottom=20),
             content=Row([Text('Selecione uma das opçoes acima para exibir os contratos', size=30)],
                         alignment=MainAxisAlignment.CENTER)
-
         )
 
         return Column(
