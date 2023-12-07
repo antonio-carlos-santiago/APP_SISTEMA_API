@@ -69,7 +69,6 @@ def verifica_sessoes(convenios):
 
 
 def salvar_dados_retornados(dados):
-    print('chegou aqui')
     for dados_linha in dados:
         print(dados_linha)
         print()
@@ -137,14 +136,14 @@ def consultas_diarias_realizadas():
     return todas_as_consultas
 
 
-def buscar_selecionado(matricula):
+def buscar_selecionado(id_selecionado):
     matricula_registrada = sessao.query(Selecionado).first()
     if not matricula_registrada:
-        nova_matricula = Selecionado(matricula=matricula)
+        nova_matricula = Selecionado(id_selecionado_cliente=int(id_selecionado))
         sessao.add(nova_matricula)
         sessao.commit()
     else:
-        matricula_registrada.matricula = matricula
+        matricula_registrada.id_selecionado_cliente = int(id_selecionado)
         sessao.commit()
 
 

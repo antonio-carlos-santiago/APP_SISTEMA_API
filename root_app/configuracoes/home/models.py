@@ -43,4 +43,4 @@ class Consulta(Base):
 class Selecionado(Base):
     __tablename__ = 'selecionados'
     id_selecionado = Column(Integer(), primary_key=True, autoincrement=True)
-    matricula = Column(String, nullable=False)
+    id_selecionado_cliente = Column(Integer, nullable=False)

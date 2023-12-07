@@ -151,7 +151,7 @@ class Home(UserControl):
                 for emprestimo in todas_as_consultas:
                     if emprestimo.data_consulta == datetime.utcnow().date():
                         matricula = emprestimo.matricula
-                        cliente = Container(bgcolor='red', width=460, key=str(matricula), content=
+                        cliente = Container(bgcolor='red', width=460, key=str(emprestimo.id_consulta), content=
                         Text(value=f'Cliente: {emprestimo.nome[:15]} Matricula: {matricula} CPF: {emprestimo.cpf}'),
                                             on_click=lambda matricula=matricula: botao_selecionado(matricula))
                         coluna_de_pesquisados.controls.append(cliente)
