@@ -26,7 +26,7 @@ def main(page: Page):
             page.update()
 
         elif page.route == '/cliente':
-            page.window_width = 800
+            page.window_width = 1050
             page.window_height = 800
             page.theme_mode = ThemeMode.DARK
             page.title = 'Cliente'

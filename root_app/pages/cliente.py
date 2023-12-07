@@ -10,6 +10,22 @@ class Cliente(UserControl):
         super().__init__()
         self.page = page
         self.dados_cliente = buscar_cliente()
+        self.tipo_de_busca = self.tipo_radio()
+
+    def radio_click(self, e):
+        print('ta chegando')
+
+
+    def tipo_radio(self):
+        radio_elemento = RadioGroup(
+            on_change=self.radio_click,
+            value='Emprestimo',
+            content=Row([
+                Radio(value='Emprestimo', label='Emprestimo'),
+                Radio(value='Cartão', label='Cartão')
+            ])
+        )
+        return radio_elemento
 
     def eventosbar(self, e: ControlEvent):
         botao_string = str(e.control)[13:]
@@ -24,31 +40,32 @@ class Cliente(UserControl):
         self.update()
 
     def elementos_dados_cliente(self):
+
         dados_cliente = Column([
             Container(
                 key=str(self.dados_cliente.nome),
-                content=Row([Text(value=f"Nome: {self.dados_cliente.nome}"),
+                content=Row([Text(value=f"Nome:    {self.dados_cliente.nome}"),
                              IconButton(icon=icons.COPY, icon_size=20)]),
                 on_click=self.copia_dados,
                 width=320
             ),
             Container(
                 key=str(self.dados_cliente.cpf),
-                content=Row([Text(value=f"CPF: {self.dados_cliente.cpf}"),
+                content=Row([Text(value=f"CPF:    {self.dados_cliente.cpf}"),
                              IconButton(icon=icons.COPY, icon_size=20)]),
                 on_click=self.copia_dados,
                 width=320
             ),
             Container(
                 key=str(self.dados_cliente.matricula),
-                content=Row([Text(value=f"Matricula: {self.dados_cliente.matricula}"),
+                content=Row([Text(value=f"Matricula:    {self.dados_cliente.matricula}"),
                              IconButton(icon=icons.COPY, icon_size=20)]),
                 on_click=self.copia_dados,
                 width=320
             ),
             Container(
                 key=str(self.dados_cliente.convenio),
-                content=Row([Text(value=f"Convenio: {self.dados_cliente.convenio}"),
+                content=Row([Text(value=f"Convenio:    {self.dados_cliente.convenio}"),
                              IconButton(icon=icons.COPY,
                                         icon_size=20)]),
                 on_click=self.copia_dados,
@@ -79,21 +96,63 @@ class Cliente(UserControl):
                 width=320
             ),
             Container(
-                key=str(self.dados_cliente.data_consulta),
-                content=Row([Text(value=f"Data Consulta:    {self.dados_cliente.data_consulta}"),
-                             IconButton(icon=icons.COPY,
-                                        icon_size=20)]),
-                on_click=self.copia_dados,
+                content=Row([Text('Exibir contratos: '), self.tipo_de_busca]),
                 width=320,
             ),
         ])
-
-
         return Row([
             dados_cliente,
             dados_margens
         ],
-        alignment=MainAxisAlignment.SPACE_AROUND)
+            alignment=MainAxisAlignment.SPACE_AROUND
+        )
+
+    def elementos_linhas_emprestimo(self):
+        busca = None
+        if self.tipo_de_busca.value == "Emprestimo":
+            busca = self.dados_cliente.emprestimos
+        else:
+            busca = self.dados_cliente.cartoes
+
+        scrool = Column(
+            height=500,
+            width=1050,
+            scroll=ScrollMode.ALWAYS,
+        )
+
+        linhas_de_emprestimos = []
+
+        for emprestimo in busca:
+            linhas_de_emprestimos.append(
+                DataRow(
+                    cells=[DataCell(Text(value=f'{emprestimo["ade"]}')),
+                           DataCell(Text(value=f'{emprestimo["data_deferimento"]}')),
+                           DataCell(Text(value=f'{emprestimo["servicos"]}')),
+                           DataCell(Text(value=f'{emprestimo["consignataria"]}')),
+                           DataCell(Text(value=f'{emprestimo["parcela_atual"]}')),
+                           DataCell(Text(value=f'{emprestimo["parcela_total"]}')),
+                           DataCell(Text(value=f'{emprestimo["valor"]}')),
+                           DataCell(Text(value=f'{emprestimo["status"]}'))]
+                )
+            )
+
+        lista_de_emprestimos = DataTable(
+            columns=[
+                DataColumn(Text('ADE')),
+                DataColumn(Text('DEFERIMENTO')),
+                DataColumn(Text('SERVIÇO')),
+                DataColumn(Text('CONSIGNATARIA')),
+                DataColumn(Text('ATUAL')),
+                DataColumn(Text('TOTAL')),
+                DataColumn(Text('VALOR')),
+                DataColumn(Text('STATUS')),
+            ],
+            rows=linhas_de_emprestimos
+
+        )
+        scrool.controls.append(lista_de_emprestimos)
+
+        return scrool
 
     def build(self):
         navigation_bar = NavigationBar(
@@ -107,7 +166,7 @@ class Cliente(UserControl):
 
         conteiner_dados = Container(
             bgcolor='#363636',
-            width=800,
+            width=1050,
             height=200,
             border_radius=10,
             content=self.elementos_dados_cliente(),
@@ -116,21 +175,17 @@ class Cliente(UserControl):
 
         conteiner_emprestimos = Container(
             bgcolor='#363636',
-            width=800,
+            width=1050,
             height=400,
-            border_radius=10
+            border_radius=10,
+            content=self.elementos_linhas_emprestimo(),
+            padding=padding.only(bottom=20)
         )
 
         return Column(
             [
                 navigation_bar,
                 conteiner_dados,
-                Container(
-                    bgcolor='#363636',
-                    width=800,
-                    height=30,
-                    border_radius=10
-                ),
                 conteiner_emprestimos,
             ]
         )
