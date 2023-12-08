@@ -18,25 +18,25 @@ def main(page: Page):
             page.window_width = 1005
             page.window_height = 560
 
-        # elif page.route == '/home':
-        #     page.window_width = 1045
-        #     page.window_height = 670
-        #     page.title = 'Home'
-        #     page.theme_mode = ThemeMode.DARK
-        #     page.update()
-        #
-        # elif page.route == '/cliente':
-        #     page.window_width = 1020
-        #     page.window_height = 760
-        #     page.theme_mode = ThemeMode.DARK
-        #     page.title = 'Cliente'
-        #     page.update()
-        #
-        # elif page.route == '/detalhes':
-        #     page.window_width = 1050
-        #     page.window_height = 760
-        #     page.theme_mode = ThemeMode.DARK
-        #     page.title = 'Detalhes'
+        elif page.route == '/home':
+            page.window_width = 1045
+            page.window_height = 670
+            page.title = 'Home'
+            page.theme_mode = ThemeMode.DARK
+            page.update()
+
+        elif page.route == '/cliente':
+            page.window_width = 1020
+            page.window_height = 760
+            page.theme_mode = ThemeMode.DARK
+            page.title = 'Cliente'
+            page.update()
+
+        elif page.route == '/detalhes':
+            page.window_width = 1050
+            page.window_height = 760
+            page.theme_mode = ThemeMode.DARK
+            page.title = 'Detalhes'
 
     page.on_route_change = router_change
     page.go('/login')

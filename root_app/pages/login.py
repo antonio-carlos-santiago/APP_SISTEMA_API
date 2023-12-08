@@ -40,7 +40,8 @@ class Login(UserControl):
             bgcolor='#FF7F50',
             width=200,
             height=50,
-            elevation=10
+            elevation=10,
+            on_click=lambda _: self.page.go('/home')
         )
         elementos = Column(
             [
