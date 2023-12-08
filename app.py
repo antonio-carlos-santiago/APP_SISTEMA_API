@@ -13,29 +13,30 @@ def main(page: Page):
         page.views.append(
             views_handler(page)[page.route]
         )
-        if page.route == '/home':
-            page.title = 'Home'
-            page.window_width = 1045
-            page.window_height = 670
-            page.theme_mode = ThemeMode.DARK
-
-        elif page.route == '/login':
-            page.window_width = 300
+        if page.route == '/login':
             page.title = 'Login'
-            page.update()
+            page.window_width = 1005
+            page.window_height = 560
 
-        elif page.route == '/cliente':
-            page.window_width = 1050
-            page.window_height = 760
-            page.theme_mode = ThemeMode.DARK
-            page.title = 'Cliente'
-            page.update()
-
-        elif page.route == '/detalhes':
-            page.window_width = 1050
-            page.window_height = 760
-            page.theme_mode = ThemeMode.DARK
-            page.title = 'Detalhes'
+        # elif page.route == '/home':
+        #     page.window_width = 1045
+        #     page.window_height = 670
+        #     page.title = 'Home'
+        #     page.theme_mode = ThemeMode.DARK
+        #     page.update()
+        #
+        # elif page.route == '/cliente':
+        #     page.window_width = 1020
+        #     page.window_height = 760
+        #     page.theme_mode = ThemeMode.DARK
+        #     page.title = 'Cliente'
+        #     page.update()
+        #
+        # elif page.route == '/detalhes':
+        #     page.window_width = 1050
+        #     page.window_height = 760
+        #     page.theme_mode = ThemeMode.DARK
+        #     page.title = 'Detalhes'
 
     page.on_route_change = router_change
     page.go('/login')
