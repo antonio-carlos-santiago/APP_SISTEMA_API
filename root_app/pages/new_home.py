@@ -33,7 +33,6 @@ class NewHome(UserControl):
         self.calendario.on_change = self.change_date
         self.calendario.value = datetime.today()
 
-
     def elementos_pesquisa(self):
         self.formulario_cpf = TextField(
             hint_text='Insira o CPF',
@@ -136,7 +135,6 @@ class NewHome(UserControl):
         return elementos
 
     def change_date(self, e):
-
         self.campo_data.value = self.calendario.value.strftime('%d/%m/%Y')
         self.update()
 
@@ -155,11 +153,17 @@ class NewHome(UserControl):
         self.data_seguinte = IconButton(icon=icons.ARROW_RIGHT, bgcolor=self.cor_do_botao, on_click=self.adiciona_data)
         self.campo_data = Text(value=f"{datetime.today().strftime('%d/%m/%Y')}", bgcolor=self.cor_do_botao, size=20)
 
-
         elementos = Row(
             controls=[
                 self.data_anterior,
-                self.campo_data,
+                Container(
+                    content=self.campo_data,
+                    bgcolor=self.cor_do_botao,
+                    height=40,
+                    border_radius=20,
+                    width=150,
+                    alignment=alignment.center
+                ),
                 IconButton(icon=icons.CALENDAR_MONTH, bgcolor=self.cor_do_botao,
                            on_click=lambda _: self.calendario.pick_date()),
                 self.data_seguinte
