@@ -14,11 +14,10 @@ class NewHome(UserControl):
 
     def elementos_pesquisa(self):
         self.formulario_cpf = TextField(
-            border=InputBorder.NONE,
             hint_text='Insira o CPF',
             prefix_icon=icons.FIND_IN_PAGE,
             bgcolor='#FA8072',
-            border_color='#FF6347',
+            border_color='black',
             input_filter=NumbersOnlyInputFilter(),
             cursor_color='black',
             max_length=11,
@@ -26,9 +25,8 @@ class NewHome(UserControl):
             text_size=20,
             text_align=TextAlign.CENTER,
             autofocus=True,
-            counter_style=TextStyle(color='#7FFFD4')
-
-
+            counter_style=TextStyle(color='black'),
+            border_radius=10
         )
         self.lista_convenio = Dropdown(
             options=[dropdown.Option('Selecione o Convenio'), dropdown.Option('AMAZONPREV')],
@@ -37,15 +35,18 @@ class NewHome(UserControl):
             width=300,
             value='Selecione o Convenio',
             alignment=alignment.center,
-            filled=True
+            filled=True,
+            border_color='black',
+            border_radius=10
         )
         self.botao_busca = ElevatedButton(
             icon=icons.CHECK,
-            text='Buscar',
+            text='BUSCAR',
             bgcolor='#FF7F50',
             width=200,
             height=50,
             elevation=10,
+            color='black',
         )
         self.barra_de_carregamento = Row([Icon(name=icons.FIND_IN_PAGE),
                                           ProgressBar(
@@ -115,7 +116,7 @@ class NewHome(UserControl):
             bgcolor='#A52A2A',
             width=500,
             height=400,
-            border_radius=10,
+            border_radius=15,
             padding=padding.only(top=40, right=20, left=20, bottom=20),
             content=self.elementos_pesquisa()
 
@@ -125,7 +126,7 @@ class NewHome(UserControl):
             bgcolor='#A52A2A',
             width=500,
             height=200,
-            border_radius=10,
+            border_radius=15,
             padding=padding.only(top=80, right=20, left=20, bottom=20)
         )
 
@@ -133,7 +134,7 @@ class NewHome(UserControl):
             bgcolor='#A52A2A',
             width=500,
             height=610,
-            border_radius=10,
+            border_radius=15,
             padding=padding.only(top=20, right=20, left=20, bottom=20),
 
         )

@@ -22,6 +22,7 @@ def main(page: Page):
             page.window_width = 1045
             page.window_height = 670
             page.title = 'New Home'
+            page.theme_mode = ThemeMode.DARK
 
         # elif page.route == '/home':
         #     page.window_width = 1045
