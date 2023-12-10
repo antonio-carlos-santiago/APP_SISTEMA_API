@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 from flet import *
 
-from root_app.shared.database import SessionLocal
 from root_app.configuracoes.home.models import Consulta
+from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
 
@@ -145,31 +145,56 @@ class NewHome(UserControl):
 
         for cliente in clientes:
             linha = ExpansionPanelList(
-                    controls=[
-                        ExpansionPanel(
-                            header=ListTile(title=Text(f'{cliente.nome} -- {cliente.matricula}')),
-                            bgcolor='#800000',
-                            content=Container(
-                                content=Column(
-                                    [
-                                        Row([
-                                            Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
-                                            Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
-                                        ]),
-                                        Text(f"CPF : {cliente.cpf}"),
-                                        Text(f"Convenio : {cliente.convenio}"),
-                                        Row([
-                                            # aqui vou colocar icones para fazer varias açoes
-                                        ])
-                                    ],
+                controls=[
+                    ExpansionPanel(
+                        header=ListTile(title=Text(f'{cliente.nome} -- {cliente.matricula}')),
+                        bgcolor=self.cor_do_botao,
+                        content=Container(
+                            content=Column(
+                                [
+                                    Row([
+                                        Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
+                                        Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
+                                    ]),
+                                    Text(f"CPF : {cliente.cpf}"),
+                                    Text(f"Convenio : {cliente.convenio}"),
+                                    Container(
+                                        content=Row([
+                                            Column(
+                                                controls=[
+                                                    IconButton(icon=icons.LIST_SHARP, icon_size=25),
+                                                    Text('Detalhes', size=10)
+                                                ]
+                                                ,
+                                                spacing=1,
+                                                alignment=MainAxisAlignment.CENTER,
+                                                key=str(cliente.id_consulta)
+                                            ),
+                                            Column(
+                                                controls=[
+                                                    IconButton(icon=icons.DELETE_SHARP, icon_size=25),
+                                                    Text('Del Cons', size=10)
+                                                ]
+                                                ,
+                                                spacing=1,
+                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                key=str(cliente.id_consulta)
+                                            )
+                                        ],
+                                        alignment=MainAxisAlignment.SPACE_AROUND),
+                                        bgcolor='black',
+                                        border_radius=10,
+                                        padding=padding.only(left=20, right=20)
+                                    )
+                                ],
 
-                                ),
-                                padding=padding.only(left=20, bottom=20)
-                            )
-                            ,
-
+                            ),
+                            padding=padding.only(left=20, bottom=20, right=20)
                         )
-                    ])
+                        ,
+
+                    )
+                ])
             self.coluna_scroll.controls.append(linha)
         self.update()
 
