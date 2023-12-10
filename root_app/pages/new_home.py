@@ -2,11 +2,17 @@ from datetime import datetime, timedelta
 
 from flet import *
 
+from root_app.shared.database import SessionLocal
+from root_app.configuracoes.home.models import Consulta
+
+session = SessionLocal()
+
 
 def calendario():
     date_picker = DatePicker(
         first_date=datetime(2023, 10, 1),
         last_date=datetime(2024, 10, 1),
+        value=datetime.today()
     )
     return date_picker
 
@@ -17,7 +23,6 @@ class NewHome(UserControl):
         super().__init__()
         self.campo_data = None
         self.conteiner_lista_clientes = None
-        self.coluna_scroll = None
         self.data_seguinte = None
         self.data_anterior = None
         self.barra_de_carregamento = None
@@ -31,7 +36,6 @@ class NewHome(UserControl):
         self.calendario = calendario()
         self.page.overlay.append(self.calendario)
         self.calendario.on_change = self.change_date
-        self.calendario.value = datetime.today()
 
     def elementos_pesquisa(self):
         self.formulario_cpf = TextField(
@@ -134,18 +138,56 @@ class NewHome(UserControl):
         )
         return elementos
 
+    def adiciona_elemento(self, data):
+        data = datetime.date(data)
+        self.coluna_scroll.controls.clear()
+        clientes = session.query(Consulta).filter_by(data_consulta=data).all()
+
+        for cliente in clientes:
+            linha = ExpansionPanelList(
+                    controls=[
+                        ExpansionPanel(
+                            header=ListTile(title=Text(f'{cliente.nome} -- {cliente.matricula}')),
+                            bgcolor='#800000',
+                            content=Container(
+                                content=Column(
+                                    [
+                                        Row([
+                                            Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
+                                            Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
+                                        ]),
+                                        Text(f"CPF : {cliente.cpf}"),
+                                        Text(f"Convenio : {cliente.convenio}"),
+                                        Row([
+                                            # aqui vou colocar icones para fazer varias açoes
+                                        ])
+                                    ],
+
+                                ),
+                                padding=padding.only(left=20, bottom=20)
+                            )
+                            ,
+
+                        )
+                    ])
+            self.coluna_scroll.controls.append(linha)
+        self.update()
+
     def change_date(self, e):
         self.campo_data.value = self.calendario.value.strftime('%d/%m/%Y')
+        self.adiciona_elemento(self.calendario.value)
         self.update()
 
     def dininui_data(self, e):
         self.calendario.value = self.calendario.value - timedelta(days=1)
         self.campo_data.value = self.calendario.value.strftime('%d/%m/%Y')
+        self.adiciona_elemento(self.calendario.value)
         self.update()
 
     def adiciona_data(self, e):
         self.calendario.value = self.calendario.value + timedelta(days=1)
         self.campo_data.value = self.calendario.value.strftime('%d/%m/%Y')
+        self.adiciona_elemento(self.calendario.value)
         self.update()
 
     def elementos_titulo_cliente(self):
@@ -172,16 +214,6 @@ class NewHome(UserControl):
         )
         return elementos
 
-    def elementos_lista_consultados(self):
-        self.coluna_scroll = Column()
-        elementos = Column([
-            Row([
-
-            ]),
-
-        ])
-        return elementos
-
     def build(self):
         conteiner_pesquisa = Container(
             bgcolor=self.cor_conteiner,
@@ -206,8 +238,14 @@ class NewHome(UserControl):
             width=500,
             height=50,
             border_radius=15,
-            padding=padding.only(top=5, right=100, left=100, bottom=5),
+            padding=padding.only(top=5, right=80, left=80, bottom=5),
             content=self.elementos_titulo_cliente()
+        )
+        self.coluna_scroll = Column(
+            scroll=ScrollMode.ALWAYS,
+            auto_scroll=True,
+            spacing=5,
+            alignment=MainAxisAlignment.CENTER
         )
 
         self.conteiner_lista_clientes = Container(
@@ -216,6 +254,7 @@ class NewHome(UserControl):
             height=550,
             border_radius=15,
             padding=padding.only(top=20, right=20, left=20, bottom=20),
+            content=self.coluna_scroll
 
         )
         return Row([
