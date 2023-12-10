@@ -142,60 +142,61 @@ class NewHome(UserControl):
         data = datetime.date(data)
         self.coluna_scroll.controls.clear()
         clientes = session.query(Consulta).filter_by(data_consulta=data).all()
-
-        for cliente in clientes:
-            linha = ExpansionPanelList(
-                controls=[
-                    ExpansionPanel(
-                        header=ListTile(title=Text(f'{cliente.nome} -- {cliente.matricula}')),
-                        bgcolor=self.cor_do_botao,
-                        content=Container(
-                            content=Column(
-                                [
-                                    Row([
-                                        Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
-                                        Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
-                                    ]),
-                                    Text(f"CPF : {cliente.cpf}"),
-                                    Text(f"Convenio : {cliente.convenio}"),
-                                    Container(
-                                        content=Row([
-                                            Column(
+        if clientes:
+            for cliente in clientes:
+                linha = ExpansionPanelList(
+                    controls=[
+                        ExpansionPanel(
+                            header=ListTile(title=Text(f'{cliente.nome} -- {cliente.matricula}')),
+                            bgcolor=self.cor_do_botao,
+                            content=Container(
+                                content=Column(
+                                    [
+                                        Row([
+                                            Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
+                                            Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
+                                        ]),
+                                        Text(f"CPF : {cliente.cpf}"),
+                                        Text(f"Convenio : {cliente.convenio}"),
+                                        Container(
+                                            content=Row(
                                                 controls=[
-                                                    IconButton(icon=icons.LIST_SHARP, icon_size=25),
-                                                    Text('Detalhes', size=10)
-                                                ]
-                                                ,
-                                                spacing=1,
-                                                alignment=MainAxisAlignment.CENTER,
-                                                key=str(cliente.id_consulta)
-                                            ),
-                                            Column(
-                                                controls=[
-                                                    IconButton(icon=icons.DELETE_SHARP, icon_size=25),
-                                                    Text('Del Cons', size=10)
-                                                ]
-                                                ,
-                                                spacing=1,
-                                                alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                                key=str(cliente.id_consulta)
-                                            )
-                                        ],
-                                        alignment=MainAxisAlignment.SPACE_AROUND),
-                                        bgcolor='black',
-                                        border_radius=10,
-                                        padding=padding.only(left=20, right=20)
-                                    )
-                                ],
+                                                    Column(
+                                                        controls=[
+                                                            IconButton(icon=icons.LIST_SHARP, icon_size=25),
+                                                            Text('Detalhes', size=10)
+                                                        ],
+                                                        spacing=1,
+                                                        alignment=MainAxisAlignment.CENTER,
+                                                        key=str(cliente.id_consulta)
+                                                    ),
+                                                    Column(
+                                                        controls=[
+                                                            IconButton(icon=icons.DELETE_SHARP, icon_size=25),
+                                                            Text('Del Cons', size=10)
+                                                        ],
+                                                        spacing=1,
+                                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
+                                                        key=str(cliente.id_consulta)
+                                                    )
+                                                ],
+                                                alignment=MainAxisAlignment.SPACE_AROUND),
+                                            bgcolor='black',
+                                            border_radius=10,
+                                            padding=padding.only(left=20, right=20)
+                                        )
+                                    ],
 
-                            ),
-                            padding=padding.only(left=20, bottom=20, right=20)
+                                ),
+                                padding=padding.only(left=20, bottom=20, right=20)
+                            )
+                            ,
+
                         )
-                        ,
-
-                    )
-                ])
-            self.coluna_scroll.controls.append(linha)
+                    ])
+                self.coluna_scroll.controls.append(linha)
+        else:
+            pass
         self.update()
 
     def change_date(self, e):
