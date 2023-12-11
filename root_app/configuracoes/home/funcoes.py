@@ -147,3 +147,7 @@ def buscar_selecionado(id_selecionado):
         sessao.commit()
 
 
+def deletar_consulta(id_selecionado):
+    consulta_selecionada = sessao.query(Consulta).filter_by(id_consulta=int(id_selecionado)).first()
+    sessao.delete(consulta_selecionada)
+    sessao.commit()

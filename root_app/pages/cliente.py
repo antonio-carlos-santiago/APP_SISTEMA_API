@@ -17,7 +17,7 @@ class Cliente(UserControl):
         botao_string = str(e.control)[13:]
         botao_dicionario = ast.literal_eval(botao_string)
         if int(botao_dicionario['selectedindex']) == 0:
-            self.page.go('/home')
+            self.page.go('/new_home')
         elif int(botao_dicionario['selectedindex']) == 1:
             self.page.go('/detalhes')
 

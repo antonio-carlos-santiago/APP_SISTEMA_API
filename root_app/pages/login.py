@@ -41,7 +41,7 @@ class Login(UserControl):
             width=200,
             height=50,
             elevation=10,
-            on_click=lambda _: self.page.go('/home')
+            on_click=lambda _: self.page.go('/new_home')
         )
         elementos = Column(
             [

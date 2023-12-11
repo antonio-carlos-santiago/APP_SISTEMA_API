@@ -1,7 +1,11 @@
+import ast
 from datetime import datetime, timedelta
+from time import sleep
 
 from flet import *
 
+from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, consultar_margem, \
+    salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.shared.database import SessionLocal
 
@@ -21,6 +25,13 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.coluna_scroll = Column(
+            scroll=ScrollMode.ALWAYS,
+            auto_scroll=True,
+            spacing=5,
+            alignment=MainAxisAlignment.CENTER
+        )
+
         self.campo_data = None
         self.conteiner_lista_clientes = None
         self.data_seguinte = None
@@ -36,6 +47,60 @@ class NewHome(UserControl):
         self.calendario = calendario()
         self.page.overlay.append(self.calendario)
         self.calendario.on_change = self.change_date
+        self.adiciona_elemento(datetime.today())
+
+    def buscar_margem(self, e):
+        cpf = valida_cpf(self.formulario_cpf.value)
+        if self.lista_convenio.value == 'Selecione o Convenio':
+            self.lista_convenio.error_text = 'Verifique o convenio'
+            self.update()
+        elif not cpf:
+            self.formulario_cpf.error_text = 'Verifique o CPF'
+            self.update()
+        else:
+
+            self.barra_de_carregamento.visible = True
+            self.botao_busca.visible = False
+            self.update()
+            resultado = consultar_margem(cpf, self.lista_convenio.value)
+            if 'status' in resultado:
+                if not resultado['status']:
+                    self.avisos_adicionais.value = resultado['info']
+                    self.barra_de_carregamento.visible = False
+                    self.avisos_adicionais.visible = True
+                    self.botao_busca.visible = True
+                    self.update()
+            else:
+                salvar_dados_retornados(resultado)
+                self.avisos_adicionais.value = 'Cliente consultado'
+                self.barra_de_carregamento.visible = False
+                self.avisos_adicionais.visible = True
+                self.botao_busca.visible = True
+                self.adiciona_elemento(datetime.today())
+                self.campo_data.value = datetime.today().strftime('%d/%m/%Y')
+                self.calendario.value = datetime.today()
+                self.update()
+
+    def trata_erros(self, e):
+        self.avisos_adicionais.visible = False
+        self.formulario_cpf.error_text = None
+        self.lista_convenio.error_text = None
+        self.update()
+
+    def botao_selecionado(self, botao: ControlEvent):
+        botao_string = str(botao.control)[10:]
+        print(botao_string)
+        botao_dicionario = ast.literal_eval(botao_string)
+        buscar_selecionado(botao_dicionario['key'])
+        self.page.go('/cliente')
+
+    def deletar_consulta(self, botao: ControlEvent):
+        botao_string = str(botao.control)[10:]
+        print(botao_string)
+        botao_dicionario = ast.literal_eval(botao_string)
+        deletar_consulta(botao_dicionario['key'])
+        self.adiciona_elemento(self.calendario.value)
+        self.update()
 
     def elementos_pesquisa(self):
         self.formulario_cpf = TextField(
@@ -51,7 +116,8 @@ class NewHome(UserControl):
             autofocus=True,
             counter_style=TextStyle(color='black'),
             border_radius=10,
-            filled=True
+            filled=True,
+            on_change=self.trata_erros
         )
         self.lista_convenio = Dropdown(
             options=[dropdown.Option('Selecione o Convenio'), dropdown.Option('AMAZONPREV')],
@@ -61,7 +127,8 @@ class NewHome(UserControl):
             alignment=alignment.center,
             filled=True,
             border_color='white',
-            border_radius=10
+            border_radius=10,
+            on_change=self.trata_erros
         )
         self.botao_busca = ElevatedButton(
             icon=icons.FIND_IN_PAGE,
@@ -70,7 +137,8 @@ class NewHome(UserControl):
             height=40,
             elevation=10,
             bgcolor=self.cor_do_botao,
-            color='white'
+            color='white',
+            on_click=self.buscar_margem
         )
         self.barra_de_carregamento = Row([Icon(name=icons.FIND_IN_PAGE),
                                           ProgressBar(
@@ -163,7 +231,12 @@ class NewHome(UserControl):
                                                 controls=[
                                                     Column(
                                                         controls=[
-                                                            IconButton(icon=icons.LIST_SHARP, icon_size=25),
+                                                            IconButton(
+                                                                icon=icons.LIST_SHARP,
+                                                                icon_size=25,
+                                                                on_click=self.botao_selecionado,
+                                                                key=str(cliente.id_consulta)
+                                                            ),
                                                             Text('Detalhes', size=10)
                                                         ],
                                                         spacing=1,
@@ -172,7 +245,12 @@ class NewHome(UserControl):
                                                     ),
                                                     Column(
                                                         controls=[
-                                                            IconButton(icon=icons.DELETE_SHARP, icon_size=25),
+                                                            IconButton(
+                                                                icon=icons.DELETE_SHARP,
+                                                                icon_size=25,
+                                                                on_click=self.deletar_consulta,
+                                                                key=str(cliente.id_consulta)
+                                                            ),
                                                             Text('Del Cons', size=10)
                                                         ],
                                                         spacing=1,
@@ -241,13 +319,15 @@ class NewHome(UserControl):
         return elementos
 
     def build(self):
+
         conteiner_pesquisa = Container(
             bgcolor=self.cor_conteiner,
             width=500,
             height=400,
             border_radius=15,
             padding=padding.only(right=20, left=20, bottom=10),
-            content=self.elementos_pesquisa()
+            content=self.elementos_pesquisa(),
+            on_hover=self.trata_erros
 
         )
 
@@ -267,12 +347,7 @@ class NewHome(UserControl):
             padding=padding.only(top=5, right=80, left=80, bottom=5),
             content=self.elementos_titulo_cliente()
         )
-        self.coluna_scroll = Column(
-            scroll=ScrollMode.ALWAYS,
-            auto_scroll=True,
-            spacing=5,
-            alignment=MainAxisAlignment.CENTER
-        )
+
 
         self.conteiner_lista_clientes = Container(
             bgcolor=self.cor_conteiner,
