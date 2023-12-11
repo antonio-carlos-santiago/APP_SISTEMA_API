@@ -36,7 +36,7 @@ def views_handler(page):
         '/new_home': View(
             route='/new_home',
             controls=[
-                NewHome(page)
+                NewHome(page, )
             ]
         )
     }

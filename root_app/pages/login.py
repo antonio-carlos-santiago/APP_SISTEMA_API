@@ -1,16 +1,33 @@
 from flet import *
 
-from root_app.configuracoes.login.funcoes import ler_imagem
+from root_app.configuracoes.login.funcoes import ler_imagem, efetua_login
+from root_app.pages import dados_de_acesso_autorizado
 
 
 class Login(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.imagem_svc_login = ler_imagem(r'root_app\imagens\imagem_login')
         self.botao_login = None
         self.formulario_senha = None
         self.formulario_login = None
         self.page = page
+
+    def solicitacao_login(self, e):
+        retorno = efetua_login(self.formulario_login.value, self.formulario_senha.value)
+        if retorno['status']:
+            dados_de_acesso_autorizado['vencimento'] = retorno['vencimento']
+            dados_de_acesso_autorizado['nome'] = retorno['nome']
+            dados_de_acesso_autorizado['nome_escritorio'] = retorno['nome_escritorio']
+            dados_de_acesso_autorizado['cpfoucnpf'] = retorno['cpfoucnpf']
+            dados_de_acesso_autorizado['telefone'] = retorno['telefone']
+            dados_de_acesso_autorizado['email'] = retorno['email']
+            dados_de_acesso_autorizado['data_atual'] = retorno['data_atual']
+            self.page.go('/new_home')
+        else:
+            self.formulario_senha.error_text = retorno['info']
+            self.update()
 
     def elementos_login(self):
         self.formulario_login = TextField(
@@ -31,7 +48,8 @@ class Login(UserControl):
             border_color='#FF6347',
             cursor_color='black',
             password=True,
-            can_reveal_password=True
+            can_reveal_password=True,
+            error_style=TextStyle(color='black')
         )
 
         self.botao_login = ElevatedButton(
@@ -41,7 +59,7 @@ class Login(UserControl):
             width=200,
             height=50,
             elevation=10,
-            on_click=lambda _: self.page.go('/new_home')
+            on_click=self.solicitacao_login
         )
         elementos = Column(
             [
@@ -72,11 +90,11 @@ class Login(UserControl):
         return elementos
 
     def build(self):
-        imagem_svc = ler_imagem(r'root_app\imagens\imagem_login'),
+
         conteiner_imagem = Container(
             width=480,
             height=480,
-            content=Image(src=imagem_svc),
+            content=Image(src=self.imagem_svc_login),
         )
 
         conteiner_formulario = Container(

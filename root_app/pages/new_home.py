@@ -7,6 +7,7 @@ from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, 
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
+from root_app.pages import dados_de_acesso_autorizado
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -25,6 +26,7 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
             scroll=ScrollMode.ALWAYS,
@@ -86,36 +88,43 @@ class NewHome(UserControl):
         return tabelas
 
     def buscar_margem(self, e):
-        cpf = valida_cpf(self.formulario_cpf.value)
-        if self.lista_convenio.value == 'Selecione o Convenio':
-            self.lista_convenio.error_text = 'Verifique o convenio'
-            self.update()
-        elif not cpf:
-            self.formulario_cpf.error_text = 'Verifique o CPF'
-            self.update()
-        else:
+        data_vencimento = datetime.strptime(dados_de_acesso_autorizado['vencimento'], "%Y-%m-%d")
+        data_servidor = datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
+        if data_vencimento >= data_servidor:
+            cpf = valida_cpf(self.formulario_cpf.value)
+            if self.lista_convenio.value == 'Selecione o Convenio':
+                self.lista_convenio.error_text = 'Verifique o convenio'
+                self.update()
+            elif not cpf:
+                self.formulario_cpf.error_text = 'Verifique o CPF'
+                self.update()
+            else:
 
-            self.barra_de_carregamento.visible = True
-            self.botao_busca.visible = False
-            self.update()
-            resultado = consultar_margem(cpf, self.lista_convenio.value)
-            if 'status' in resultado:
-                if not resultado['status']:
-                    self.avisos_adicionais.value = resultado['info']
+                self.barra_de_carregamento.visible = True
+                self.botao_busca.visible = False
+                self.update()
+                resultado = consultar_margem(cpf, self.lista_convenio.value)
+                if 'status' in resultado:
+                    if not resultado['status']:
+                        self.avisos_adicionais.value = resultado['info']
+                        self.barra_de_carregamento.visible = False
+                        self.avisos_adicionais.visible = True
+                        self.botao_busca.visible = True
+                        self.update()
+                else:
+                    salvar_dados_retornados(resultado)
+                    self.avisos_adicionais.value = 'Cliente consultado'
                     self.barra_de_carregamento.visible = False
                     self.avisos_adicionais.visible = True
                     self.botao_busca.visible = True
+                    self.adiciona_elemento(datetime.today())
+                    self.campo_data.value = datetime.today().strftime('%d/%m/%Y')
+                    self.calendario.value = datetime.today()
                     self.update()
-            else:
-                salvar_dados_retornados(resultado)
-                self.avisos_adicionais.value = 'Cliente consultado'
-                self.barra_de_carregamento.visible = False
-                self.avisos_adicionais.visible = True
-                self.botao_busca.visible = True
-                self.adiciona_elemento(datetime.today())
-                self.campo_data.value = datetime.today().strftime('%d/%m/%Y')
-                self.calendario.value = datetime.today()
-                self.update()
+        else:
+            self.avisos_adicionais.value = "Usuario com pendencias"
+            self.avisos_adicionais.visible = True
+            self.update()
 
     def trata_erros(self, e):
         self.avisos_adicionais.visible = False
@@ -174,7 +183,7 @@ class NewHome(UserControl):
             elevation=10,
             bgcolor=self.cor_do_botao,
             color='white',
-            on_click=self.buscar_margem
+            on_click=self.buscar_margem,
         )
         self.barra_de_carregamento = Row([Icon(name=icons.FIND_IN_PAGE),
                                           ProgressBar(
