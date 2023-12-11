@@ -1,12 +1,12 @@
 import ast
 from datetime import datetime, timedelta
-from time import sleep
 
 from flet import *
 
 from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, consultar_margem, \
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
+from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -25,13 +25,14 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
             scroll=ScrollMode.ALWAYS,
             auto_scroll=True,
             spacing=5,
             alignment=MainAxisAlignment.CENTER
         )
-
+        self.imagem_svg_no_data = ler_imagem(r'root_app\imagens\imagem_no_data')
         self.campo_data = None
         self.conteiner_lista_clientes = None
         self.data_seguinte = None
@@ -48,6 +49,41 @@ class NewHome(UserControl):
         self.page.overlay.append(self.calendario)
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
+
+    def elementos_tab(self):
+        tabelas = Tabs(
+            selected_index=0,
+            animation_duration=300,
+            width=200,
+            height=600,
+            label_color=self.cor_do_botao,
+            indicator_border_radius=10,
+            tabs=[
+                Tab(text="Autenticação",
+                    content=Container(
+                        width=200,
+                        height=600,
+                        bgcolor='red',
+                        border_radius=10)
+                    ),
+                Tab(text='Perfil',
+                    content=Container(
+                        width=200,
+                        height=600,
+                        bgcolor='red',
+                        border_radius=10)
+                    ),
+                Tab(text='Pagamentos',
+                    content=Container(
+                        width=200,
+                        height=600,
+                        bgcolor='red',
+                        border_radius=10)
+                    ),
+            ]
+        )
+
+        return tabelas
 
     def buscar_margem(self, e):
         cpf = valida_cpf(self.formulario_cpf.value)
@@ -176,7 +212,8 @@ class NewHome(UserControl):
                     content=Column([
                         Row([self.avisos_adicionais]),
                         Row([self.barra_de_carregamento],
-                            alignment=MainAxisAlignment.CENTER)
+                            alignment=MainAxisAlignment.CENTER),
+
                     ],
                         alignment=MainAxisAlignment.CENTER),
                     alignment=alignment.center
@@ -187,21 +224,8 @@ class NewHome(UserControl):
                     ],
                         alignment=MainAxisAlignment.CENTER
                     ),
-
-                    Divider(height=9, thickness=3),
-                    Row([
-                        Column([ElevatedButton(text='Checar Sessoes',
-                                               bgcolor=self.cor_do_botao,
-                                               icon=icons.CHECK,
-                                               color='white')],
-                               alignment=MainAxisAlignment.CENTER
-                               ),
-
-                        # aqui vai ficar o conteiner com as sessoes ativas
-                    ])
                 ],
                     alignment=MainAxisAlignment.CENTER)
-
             ], alignment=MainAxisAlignment.CENTER
         )
         return elementos
@@ -264,17 +288,20 @@ class NewHome(UserControl):
                                             padding=padding.only(left=20, right=20)
                                         )
                                     ],
-
                                 ),
                                 padding=padding.only(left=20, bottom=20, right=20)
-                            )
-                            ,
-
+                            ),
                         )
                     ])
                 self.coluna_scroll.controls.append(linha)
         else:
-            pass
+            self.coluna_scroll.controls.append(
+                Container(
+                    width=500,
+                    height=500,
+                    content=Image(src=self.imagem_svg_no_data)
+                )
+            )
         self.update()
 
     def change_date(self, e):
@@ -323,7 +350,7 @@ class NewHome(UserControl):
         conteiner_pesquisa = Container(
             bgcolor=self.cor_conteiner,
             width=500,
-            height=400,
+            height=300,
             border_radius=15,
             padding=padding.only(right=20, left=20, bottom=10),
             content=self.elementos_pesquisa(),
@@ -331,12 +358,13 @@ class NewHome(UserControl):
 
         )
 
-        conteiner_autenticacao = Container(
+        self.conteiner_autenticacao = Container(
             bgcolor=self.cor_conteiner,
             width=500,
-            height=200,
+            height=300,
             border_radius=15,
-            padding=padding.only(top=80, right=20, left=20, bottom=20)
+            padding=padding.only(right=20, left=20, bottom=20),
+            content=self.elementos_tab()
         )
 
         conteiner_titulo_cliente = Container(
@@ -348,7 +376,6 @@ class NewHome(UserControl):
             content=self.elementos_titulo_cliente()
         )
 
-
         self.conteiner_lista_clientes = Container(
             bgcolor=self.cor_conteiner,
             width=500,
@@ -358,14 +385,15 @@ class NewHome(UserControl):
             content=self.coluna_scroll
 
         )
-        return Row([
-            Column([
-                conteiner_pesquisa,
-                conteiner_autenticacao
-            ]),
-            Column([
-                conteiner_titulo_cliente,
-                self.conteiner_lista_clientes
-            ])
-
-        ])
+        return Row(
+            [
+                Column([
+                    conteiner_pesquisa,
+                    self.conteiner_autenticacao
+                ]),
+                Column([
+                    conteiner_titulo_cliente,
+                    self.conteiner_lista_clientes
+                ])
+            ]
+        )
