@@ -96,11 +96,15 @@ class NewHome(UserControl):
         self.update()
 
     def tab_autenticacao(self):
-        self.botao_autenticacao = ElevatedButton(text='Autenticar Sessão', on_click=self.autentica)
+        self.botao_autenticacao = ElevatedButton(text='Autenticar Sessão', on_click=self.autentica, height=60)
         self.avisos_autenticacao = Text()
         return Column(
             horizontal_alignment=CrossAxisAlignment.CENTER,
             controls=[
+                Container(
+                    height=30,
+                    width=20
+                ),
                 Row(
                     alignment=MainAxisAlignment.SPACE_AROUND,
                     controls=[
@@ -109,7 +113,6 @@ class NewHome(UserControl):
                     ]
                 ),
                 Container(
-                    bgcolor='red',
                     height=20,
                     width=20
                 ),
@@ -145,19 +148,41 @@ class NewHome(UserControl):
                         content=self.tab_autenticacao()
                     )
                     ),
+                Tab(text='Emitir CC',
+                    content=Container(
+                        width=200,
+                        height=600,
+                        border_radius=10,
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            alignment=MainAxisAlignment.CENTER,
+                            controls=[
+                                Text(value="Ainda em desenvolvimento"),
+                                Text(value="Em breve poderá emitir contracheques com mais eficiencia")
+                            ]
+                        )
+
+                    )),
                 Tab(text='Perfil',
                     content=Container(
                         width=200,
                         height=600,
-                        bgcolor='red',
                         border_radius=10)
                     ),
                 Tab(text='Pagamentos',
                     content=Container(
                         width=200,
                         height=600,
-                        bgcolor='red',
-                        border_radius=10)
+                        border_radius=10,
+                        content=Column(
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
+                            alignment=MainAxisAlignment.CENTER,
+                            controls=[
+                                Text(value="Ainda em desenvolvimento"),
+                                Text(value="Em breve hávera meios de pagamentos disponiveis :)")
+                            ]
+                        )
+                    )
                     ),
             ]
         )
@@ -207,6 +232,7 @@ class NewHome(UserControl):
         self.avisos_adicionais.visible = False
         self.formulario_cpf.error_text = None
         self.lista_convenio.error_text = None
+        self.avisos_autenticacao.value = None
         self.update()
 
     def botao_selecionado(self, botao: ControlEvent):
@@ -242,7 +268,9 @@ class NewHome(UserControl):
             on_change=self.trata_erros
         )
         self.lista_convenio = Dropdown(
-            options=[dropdown.Option('Selecione o Convenio'), dropdown.Option('AMAZONPREV')],
+            options=[dropdown.Option('Selecione o Convenio'), dropdown.Option('AMAZONPREV'),
+                     dropdown.Option('MANAUS'),
+                     dropdown.Option('PREFEITURA')],
             prefix_icon=icons.LIST,
             width=300,
             value='Selecione o Convenio',
@@ -342,7 +370,7 @@ class NewHome(UserControl):
                                                     Column(
                                                         controls=[
                                                             IconButton(
-                                                                icon=icons.LIST_SHARP,
+                                                                icon=icons.LIST,
                                                                 icon_size=25,
                                                                 on_click=self.botao_selecionado,
                                                                 key=str(cliente.id_consulta)
@@ -361,7 +389,21 @@ class NewHome(UserControl):
                                                                 on_click=self.deletar_consulta,
                                                                 key=str(cliente.id_consulta)
                                                             ),
-                                                            Text('Del Cons', size=10)
+                                                            Text('Detalhes', size=10)
+                                                        ],
+                                                        spacing=1,
+                                                        alignment=MainAxisAlignment.CENTER,
+                                                        key=str(cliente.id_consulta)
+                                                    ),
+                                                    Column(
+                                                        controls=[
+                                                            IconButton(
+                                                                icon=icons.PRINT,
+                                                                icon_size=25,
+                                                                disabled=True,
+                                                                tooltip="Ainda em desenvolvimento"
+                                                            ),
+                                                            Text('Imp CC', size=10)
                                                         ],
                                                         spacing=1,
                                                         alignment=MainAxisAlignment.SPACE_BETWEEN,
@@ -450,7 +492,8 @@ class NewHome(UserControl):
             height=300,
             border_radius=15,
             padding=padding.only(right=20, left=20, bottom=20),
-            content=self.elementos_tab()
+            content=self.elementos_tab(),
+            on_hover=self.trata_erros
         )
 
         conteiner_titulo_cliente = Container(
