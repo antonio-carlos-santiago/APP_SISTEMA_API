@@ -18,8 +18,8 @@ class Cliente(UserControl):
         botao_dicionario = ast.literal_eval(botao_string)
         if int(botao_dicionario['selectedindex']) == 0:
             self.page.go('/new_home')
-        elif int(botao_dicionario['selectedindex']) == 1:
-            self.page.go('/detalhes')
+        # elif int(botao_dicionario['selectedindex']) == 1:
+        #     self.page.go('/detalhes')
 
     def copia_dados(self, objeto: ControlEvent):
         print(objeto.__dict__)
@@ -151,7 +151,10 @@ class Cliente(UserControl):
             height=80,
             destinations=[
                 NavigationDestination(icon=icons.ARROW_BACK, label="Voltar"),
-                NavigationDestination(icon=icons.FIND_IN_PAGE, label="Analise Automatica")
+                NavigationDestination(icon=icons.FIND_IN_PAGE,
+                                      label="Analise Automatica",
+                                      tooltip="Ainda em desenvolvimento",
+                                      )
             ],
             on_change=self.eventosbar,
         )

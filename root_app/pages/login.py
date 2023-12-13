@@ -24,6 +24,7 @@ class Login(UserControl):
             dados_de_acesso_autorizado['telefone'] = retorno['telefone']
             dados_de_acesso_autorizado['email'] = retorno['email']
             dados_de_acesso_autorizado['data_atual'] = retorno['data_atual']
+            dados_de_acesso_autorizado['link_foto_perfil'] = retorno['link_foto_perfil']
             self.page.go('/new_home')
         else:
             self.formulario_senha.error_text = retorno['info']

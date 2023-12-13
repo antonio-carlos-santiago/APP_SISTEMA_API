@@ -1,22 +1,22 @@
 import ast
+import json
 from datetime import datetime, timedelta
+from time import sleep
 
+import requests
+from bs4 import BeautifulSoup
 from flet import *
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 
 from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, consultar_margem, \
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
-from root_app.pages import dados_de_acesso_autorizado
+from root_app.pages import dados_de_acesso_autorizado, URL_APP
 from root_app.shared.database import SessionLocal
-from time import sleep
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from bs4 import BeautifulSoup
-import requests
-import json
 
 session = SessionLocal()
 
@@ -65,7 +65,7 @@ class NewHome(UserControl):
         self.botao_autenticacao.disabled = True
         self.update()
         try:
-            url = "http://127.0.0.1:8000/sessao/nova-sessao"
+            url = f"{URL_APP}/sessao/nova-sessao"
             options = Options()
             service = Service()
             options.add_argument('--start-maximized')
@@ -76,7 +76,6 @@ class NewHome(UserControl):
                 sleep(1)
             site = BeautifulSoup(driver.page_source, 'html.parser')
             convenio = site.find('span', attrs={"id": "descricaoOrgaoLabel"}).text.split()
-            print(convenio[0])
             payload = json.dumps({
                 "sessao": driver.get_cookies()[0]['value'],
                 "convenio": convenio[0],
@@ -132,6 +131,9 @@ class NewHome(UserControl):
         )
 
     def elementos_tab(self):
+        data_vencimento = datetime.strptime(self.dados_autenticados["vencimento"], "%Y-%m-%d")
+        data_atual = datetime.strptime(self.dados_autenticados["data_atual"], "%Y-%m-%d")
+        vencimento = data_vencimento - data_atual
         tabelas = Tabs(
             selected_index=0,
             animation_duration=300,
@@ -167,7 +169,32 @@ class NewHome(UserControl):
                     content=Container(
                         width=200,
                         height=600,
-                        border_radius=10)
+                        border_radius=10,
+                        content=Column(
+                            controls=[
+                                Row(
+                                    # alignment=MainAxisAlignment.START,
+                                    controls=[
+                                        CircleAvatar(foreground_image_url=self.dados_autenticados['link_foto_perfil'],
+                                                     width=50, height=50),
+                                        Column(
+                                            controls=[
+                                                Text(value=f'Nome: {self.dados_autenticados["nome"].title()}'),
+                                                Text(
+                                                    value=f"Empresa: {self.dados_autenticados['nome_escritorio'].title()}")
+                                            ]
+                                        ),
+                                    ]
+                                ),
+                                Divider(),
+                                Text(value=f"Valído até: {data_vencimento.strftime('%d/%m/%Y')}"),
+                                Text(value=f"Dias Restante: {vencimento.days} dias"),
+                                Text(value=f"Email: {self.dados_autenticados['email']}"),
+                                Text(value=f"Telefone: {self.dados_autenticados['telefone']}")
+
+                            ]
+                        )
+                    )
                     ),
                 Tab(text='Pagamentos',
                     content=Container(
@@ -237,14 +264,12 @@ class NewHome(UserControl):
 
     def botao_selecionado(self, botao: ControlEvent):
         botao_string = str(botao.control)[10:]
-        print(botao_string)
         botao_dicionario = ast.literal_eval(botao_string)
         buscar_selecionado(botao_dicionario['key'])
         self.page.go('/cliente')
 
     def deletar_consulta(self, botao: ControlEvent):
         botao_string = str(botao.control)[10:]
-        print(botao_string)
         botao_dicionario = ast.literal_eval(botao_string)
         deletar_consulta(botao_dicionario['key'])
         self.adiciona_elemento(self.calendario.value)

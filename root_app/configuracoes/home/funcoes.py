@@ -5,13 +5,14 @@ from flet import *
 from validate_docbr import CPF
 
 from root_app.configuracoes.home.models import *
+from root_app.pages import URL_APP
 from root_app.shared.database import SessionLocal
 
 sessao = SessionLocal()
 
 
 def listar_convenios():
-    url = "http://127.0.0.1:8000/convenios/convenio"
+    url = f"{URL_APP}/convenios/convenio"
     payload = {}
     headers = {'accept': 'application/json'}
     response = requests.request("GET", url, headers=headers, data=payload)
@@ -20,7 +21,7 @@ def listar_convenios():
 
 
 def consultar_margem(cpf, convenio):
-    url = "http://127.0.0.1:8000/servicosconsuta"
+    url = f"{URL_APP}/servicosconsuta"
     payload = json.dumps({
         "cpf": cpf,
         "convenio": convenio,
@@ -50,7 +51,7 @@ def autenticacao_sessao(e):
 
 def verifica_sessoes(convenios):
     lista_de_funcoes = []
-    url = "http://127.0.0.1:8000/sessao/listar-sessoes"
+    url = f"{URL_APP}/sessao/listar-sessoes"
 
     payload = {}
     headers = {
@@ -70,8 +71,6 @@ def verifica_sessoes(convenios):
 
 def salvar_dados_retornados(dados):
     for dados_linha in dados:
-        print(dados_linha)
-        print()
         salva_cliente(
             cpf=dados_linha['dados_cliente']['cpf'],
             nome=dados_linha['dados_cliente']['nome']

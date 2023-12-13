@@ -2,6 +2,8 @@ import json
 
 import requests
 
+from root_app.pages import URL_APP
+
 
 def ler_imagem(nome_arquivo):
     with open(nome_arquivo, 'r') as arquivo:
@@ -10,7 +12,7 @@ def ler_imagem(nome_arquivo):
 
 
 def efetua_login(usuario: str, senha: str):
-    url = "http://127.0.0.1:8000/usuarios/login-user"
+    url = f"{URL_APP}/usuarios/login-user"
 
     payload = json.dumps({
         "email": f"{usuario.lower()}",
