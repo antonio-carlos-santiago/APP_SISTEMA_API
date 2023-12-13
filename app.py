@@ -37,7 +37,7 @@ def main(page: Page):
             page.title = 'Detalhes'
 
     page.on_route_change = router_change
-    page.go('/login')
+    page.go('/new_home')
 
 
 app(target=main)

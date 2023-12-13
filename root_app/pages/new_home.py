@@ -9,23 +9,32 @@ from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado
 from root_app.shared.database import SessionLocal
+from time import sleep
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+import requests
+import json
 
 session = SessionLocal()
 
 
 def calendario():
-    date_picker = DatePicker(
+    return DatePicker(
         first_date=datetime(2023, 10, 1),
         last_date=datetime(2024, 10, 1),
         value=datetime.today()
     )
-    return date_picker
 
 
 class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.avisos_autenticacao = None
+        self.botao_autenticacao = None
         self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
@@ -52,6 +61,73 @@ class NewHome(UserControl):
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
 
+    def autentica(self, e):
+        self.botao_autenticacao.disabled = True
+        self.update()
+        try:
+            url = "http://127.0.0.1:8000/sessao/nova-sessao"
+            options = Options()
+            service = Service()
+            options.add_argument('--start-maximized')
+            driver = webdriver.Chrome(service=service, options=options)
+            driver.implicitly_wait(30)
+            driver.get('https://nconsig.fenixsoft.com.br/Login.aspx')
+            while len(driver.find_elements(By.XPATH, '//*[@id="userLabel"]')) < 1:
+                sleep(1)
+            site = BeautifulSoup(driver.page_source, 'html.parser')
+            convenio = site.find('span', attrs={"id": "descricaoOrgaoLabel"}).text.split()
+            print(convenio[0])
+            payload = json.dumps({
+                "sessao": driver.get_cookies()[0]['value'],
+                "convenio": convenio[0],
+                "email": dados_de_acesso_autorizado['email']
+            })
+            headers = {
+                'accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+            requests.request("PATCH", url, headers=headers, data=payload)
+            self.avisos_autenticacao.value = f"Parabens!!, o convenio {convenio[0]} foi autenticada com sucesso"
+
+        except:
+            self.avisos_autenticacao.value = "Não foi realizada nenhuma autenticação"
+
+        self.botao_autenticacao.disabled = False
+        self.update()
+
+    def tab_autenticacao(self):
+        self.botao_autenticacao = ElevatedButton(text='Autenticar Sessão', on_click=self.autentica)
+        self.avisos_autenticacao = Text()
+        return Column(
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+            controls=[
+                Row(
+                    alignment=MainAxisAlignment.SPACE_AROUND,
+                    controls=[
+                        Checkbox(label='Fenix', value=True, disabled=True),
+                        Checkbox(label='Consiglog', value=False, disabled=True)
+                    ]
+                ),
+                Container(
+                    bgcolor='red',
+                    height=20,
+                    width=20
+                ),
+                Row(
+                    alignment=MainAxisAlignment.CENTER,
+                    controls=[
+                        self.botao_autenticacao
+                    ]
+                ),
+                Row(
+                    alignment=MainAxisAlignment.CENTER,
+                    controls=[
+                        self.avisos_autenticacao
+                    ]
+                )
+            ]
+        )
+
     def elementos_tab(self):
         tabelas = Tabs(
             selected_index=0,
@@ -65,8 +141,9 @@ class NewHome(UserControl):
                     content=Container(
                         width=200,
                         height=600,
-                        bgcolor='red',
-                        border_radius=10)
+                        border_radius=10,
+                        content=self.tab_autenticacao()
+                    )
                     ),
                 Tab(text='Perfil',
                     content=Container(

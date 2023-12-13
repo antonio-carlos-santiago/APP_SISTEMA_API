@@ -1,1 +1,1 @@
-dados_de_acesso_autorizado = {}
+dados_de_acesso_autorizado = {'vencimento': '2023-12-31', 'nome': 'antonio carlos santiago', 'nome_escritorio': 'iconnect', 'cpfoucnpf': 5303617360, 'telefone': '95981207039', 'email': 'carlos.santiago013@gmail.com', 'data_atual': '2023-12-12'}
