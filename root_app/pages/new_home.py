@@ -43,7 +43,7 @@ class NewHome(UserControl):
             spacing=5,
             alignment=MainAxisAlignment.CENTER
         )
-        self.imagem_svg_no_data = ler_imagem(r'root_app\imagens\imagem_no_data')
+        self.imagem_svg_no_data = ler_imagem(r'imagens\imagem_no_data')
         self.campo_data = None
         self.conteiner_lista_clientes = None
         self.data_seguinte = None
@@ -67,6 +67,8 @@ class NewHome(UserControl):
         try:
             url = f"{URL_APP}/sessao/nova-sessao"
             options = Options()
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
             service = Service()
             options.add_argument('--start-maximized')
             driver = webdriver.Chrome(service=service, options=options)
