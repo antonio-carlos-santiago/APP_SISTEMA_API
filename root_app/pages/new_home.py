@@ -16,7 +16,7 @@ from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, 
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
-from root_app.pages import dados_de_acesso_autorizado, URL_APP, cliente_contra_cheque_selecionado
+from root_app.pages import dados_de_acesso_autorizado, URL_APP
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -65,16 +65,8 @@ class NewHome(UserControl):
     def emitir_selecionado(self, botao: ControlEvent):
         botao_string = str(botao.control)[10:]
         botao_dicionario = ast.literal_eval(botao_string)
-        cliente_contra_cheque_selecionado['cliente'] = session.query(
-            Consulta).filter_by(id_consulta=int(botao_dicionario['key'])).first()
+        buscar_selecionado(botao_dicionario['key'])
         self.page.go('/contracheque')
-        # data_referencia = datetime.strptime(cliente.mes_referencia, "%m/%Y")
-        # if cliente.convenio != 'AMAZONPREV':
-        #     print('emitiu')
-        #     documento = consulta(cliente.cpf, data_referencia.month, data_referencia.year, cliente.nome)
-        #     if documento:
-        #         print('Agora abrimos a pasta onde se encontra o arquivo')
-
 
     def autentica(self, e):
         self.botao_autenticacao.disabled = True
