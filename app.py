@@ -36,8 +36,14 @@ def main(page: Page):
             page.theme_mode = ThemeMode.DARK
             page.title = 'Detalhes'
 
+        # elif page.route == '/contracheque':
+        #     page.window_width = 1050
+        #     page.window_height = 760
+        #     page.theme_mode = ThemeMode.DARK
+        #     page.title = 'Detalhes'
+
     page.on_route_change = router_change
-    page.go('/login')
+    page.go('/new_home')
 
 
-app(target=main, assets_dir='assets')
+app(target=main, assets_dir='assets', view=AppView.FLET_APP_WEB)
