@@ -43,7 +43,7 @@ class NewHome(UserControl):
             spacing=5,
             alignment=MainAxisAlignment.CENTER
         )
-        self.imagem_svg_no_data = ler_imagem(r'imagens\imagem_no_data')
+        self.imagem_svg_no_data = ler_imagem(r'assets\imagem_no_data')
         self.campo_data = None
         self.conteiner_lista_clientes = None
         self.data_seguinte = None

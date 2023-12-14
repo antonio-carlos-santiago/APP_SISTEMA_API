@@ -8,7 +8,7 @@ class Login(UserControl):
 
     def __init__(self, page):
         super().__init__()
-        self.imagem_svc_login = ler_imagem(r'imagens\imagem_login')
+        self.imagem_svc_login = ler_imagem(r'assets\imagem_login')
         self.botao_login = None
         self.formulario_senha = None
         self.formulario_login = None

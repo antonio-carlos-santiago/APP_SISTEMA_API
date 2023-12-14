@@ -1,0 +1,1 @@
+flet pack .\app.py --name Pedra --icon .\icone.ico --add-data "assets;."
