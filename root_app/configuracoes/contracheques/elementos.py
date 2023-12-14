@@ -8,8 +8,6 @@ cor_do_botao = '#800000'
 sessao = SessionLocal()
 
 
-
-
 def buscar_cliente_cc():
     cliente_id = sessao.query(Selecionado).first()
     if cliente_id:

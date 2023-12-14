@@ -42,5 +42,16 @@ class Consulta(Base):
 
 class Selecionado(Base):
     __tablename__ = 'selecionados'
+
     id_selecionado = Column(Integer(), primary_key=True, autoincrement=True)
     id_selecionado_cliente = Column(Integer, nullable=False)
+
+
+class Contracheque(Base):
+    __tablename__ = 'Contracheques'
+
+    id_contracheque = Column(Integer(), autoincrement=True, primary_key=True)
+    imagem_contracheque = Column(String(), nullable=False)
+    matricula = Column(String(), nullable=False)
+    data_referencia = Column(Date, nullable=False)
+    data_baixada = Column(Date, nullable=False)

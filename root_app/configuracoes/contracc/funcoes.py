@@ -1,16 +1,25 @@
-import requests
-import json
 import base64
+import json
 import os
 
+import requests
 
-def decode_code(codigo, nome, nome_cliente):
+
+def decode_code(codigo, matricula, nome_cliente, mes, ano):
     codificado = base64.b64decode(codigo)
     caminho_da_pasta = f'/CLIENTES/{nome_cliente.upper()}'
     if not os.path.exists(caminho_da_pasta):
         os.makedirs(caminho_da_pasta)
 
-    caminho_do_arquivo = os.path.join(caminho_da_pasta, f'{nome}.pdf')
+    caminho_data_emitido = f'{caminho_da_pasta}/{mes}-{ano}'
+    if not os.path.exists(caminho_data_emitido):
+        os.makedirs(caminho_data_emitido)
+
+    caminho_da_matricula = f'{caminho_data_emitido}/{matricula}'
+    if not os.path.exists(caminho_da_matricula):
+        os.makedirs(caminho_da_matricula)
+
+    caminho_do_arquivo = os.path.join(caminho_data_emitido, f'{matricula}.pdf')
     with open(caminho_do_arquivo, 'wb') as documento:
         documento.write(codificado)
         return
@@ -51,10 +60,10 @@ def get_contracheque(cpf, mes, ano, idproposta=None):
             "mes": mes
         },
         'download': {
-           "cpfServidor": cpf,
-           "dispositivo": "M",
-           "id": idproposta,
-           "tipo": "M"
+            "cpfServidor": cpf,
+            "dispositivo": "M",
+            "id": idproposta,
+            "tipo": "M"
         }
     }
     parametro = None
@@ -75,9 +84,7 @@ def consulta(cpf, mes, ano, nome_cliente):
     if autenticacao:
         for matricula in solicitacao['contracheques']:
             contracheque = get_contracheque(cpf, mes, ano, matricula['id'])
-            decode_code(contracheque['imagem'], f"{mes}-{ano}-{matricula['matricula']}", nome_cliente)
+            decode_code(contracheque['imagem'], matricula['matricula'], nome_cliente, mes, ano)
         return {'status': True}
     else:
         return {'status': False}
-
-
