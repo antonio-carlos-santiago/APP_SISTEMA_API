@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flet import *
 
+from root_app.configuracoes.contracheques.funcoes import consulta
 from root_app.pages import dados_de_acesso_autorizado
 
 
@@ -32,6 +33,7 @@ class ContraCheque(UserControl):
             counter_style=TextStyle(color='black'),
             border_radius=10,
             filled=True,
+            on_change=self.limpa_avisos
         )
         self.formulario_mes = Dropdown(
             prefix_icon=icons.CALENDAR_MONTH,
@@ -45,7 +47,8 @@ class ContraCheque(UserControl):
             options=[dropdown.Option(f'{mes}') for mes in range(1, 13)],
             text_size=15,
             hint_text='Mes',
-            label="Mes"
+            label="Mes",
+            on_change=self.limpa_avisos
         )
         self.formulario_ano = Dropdown(
             prefix_icon=icons.CALENDAR_MONTH,
@@ -60,6 +63,7 @@ class ContraCheque(UserControl):
             hint_text='Ano',
             options=[dropdown.Option(f'202{ano}') for ano in range(2, 6)],
             label="Ano",
+            on_change=self.limpa_avisos
 
         )
         self.notificacoes = Text()
@@ -72,11 +76,26 @@ class ContraCheque(UserControl):
     def emitir_cc(self, e):
         self.botao_solicita_emissao.disabled = True
         self.update()
-        # checar_dados_e_emitir(formulario_cpf.value, formulario_mes.value, formulario_ano.value, notificacoes)
+        while len(self.formulario_cpf.value) != 11:
+            self.formulario_cpf.value = f'0{self.formulario_cpf.value}'
+        status = consulta(
+            self.formulario_cpf.value,
+            self.formulario_mes.value,
+            self.formulario_ano.value
+        )
+        if not status:
+            self.notificacoes.value = 'Verifique o CPF, algo deu errado'
+        self.botao_solicita_emissao.disabled = False
+        self.update()
+
+    def limpa_avisos(self, e):
+        self.notificacoes.value = ''
+        self.update()
 
     def build(self):
         self.botao_solicita_emissao.on_click = self.emitir_cc
         return Container(
+            on_hover=self.limpa_avisos,
             width=460,
             height=230,
             padding=padding.only(top=10, left=10, right=10),

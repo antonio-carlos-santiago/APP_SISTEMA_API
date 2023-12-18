@@ -37,12 +37,6 @@ def main(page: Page):
             page.theme_mode = ThemeMode.DARK
             page.title = 'Detalhes'
 
-        elif page.route == '/contracheque':
-            page.window_width = 800
-            page.window_height = 760
-            page.theme_mode = ThemeMode.DARK
-            page.title = 'Contra Cheque'
-
     page.on_route_change = router_change
     page.go('/login')
 

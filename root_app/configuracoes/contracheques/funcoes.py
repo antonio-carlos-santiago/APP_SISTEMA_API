@@ -1,5 +1,6 @@
 import base64
 import json
+import subprocess
 import os
 from datetime import datetime
 
@@ -12,31 +13,17 @@ from root_app.shared.database import SessionLocal
 sessao = SessionLocal()
 
 
-def decode_code(codigo, matricula, nome_cliente, mes, ano):
+def decode_code(codigo, matricula, mes, ano):
     codificado = base64.b64decode(codigo)
-    caminho_da_pasta = f'/CLIENTES/{nome_cliente.upper()}'
+    caminho_local = os.getcwd()
+    caminho_da_pasta = f'{caminho_local}/CLIENTES/{matricula}'
     if not os.path.exists(caminho_da_pasta):
         os.makedirs(caminho_da_pasta)
-
-    caminho_data_emitido = f'{caminho_da_pasta}/{mes}-{ano}'
-    if not os.path.exists(caminho_data_emitido):
-        os.makedirs(caminho_data_emitido)
-
-    caminho_da_matricula = f'{caminho_data_emitido}/{matricula}'
-    if not os.path.exists(caminho_da_matricula):
-        os.makedirs(caminho_da_matricula)
-
-    caminho_do_arquivo = os.path.join(caminho_data_emitido, f'{matricula}.pdf')
+    pasta_cliente = os.path.join(caminho_local, 'CLIENTES', f'{matricula}')
+    caminho_do_arquivo = os.path.join(caminho_da_pasta, f'{matricula}.pdf')
     with open(caminho_do_arquivo, 'wb') as documento:
         documento.write(codificado)
-        return
-
-
-# def encode_code(arquivo):
-#     with open(arquivo, "rb") as documento:
-#         bytes_arquivo = documento.read()
-#         arquivo_base64 = base64.b64encode(bytes_arquivo).decode('utf-8')
-#         return arquivo_base64
+    return pasta_cliente
 
 
 def verificar_retorno(retorno):
@@ -80,7 +67,6 @@ def get_contracheque(cpf, mes, ano, idproposta=None):
         parametro = 'download'
 
     payload = json.dumps(tipo_data[parametro])
-
     informacoes_servidor = requests.post(f"{link_api}{metodos[parametro]}", headers=headers, data=payload)
     return informacoes_servidor.json()
 
@@ -90,19 +76,30 @@ def consulta(cpf, mes, ano):
     autenticacao = verificar_retorno(solicitacao)
     if autenticacao:
         for matricula in solicitacao['contracheques']:
-            contracheque = get_contracheque(cpf, mes, ano, matricula['id'])
-            print(contracheque['imagem'], type(contracheque['imagem']))
-            data_referencia_formatada = datetime.strptime(f"{mes}-{ano}", "%m-%Y")
-            data_download = datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
-            novo_contracheque = Contracheque(
-                imagem_contracheque=contracheque['imagem'],
-                matricula=matricula['id'],
-                data_referencia=data_referencia_formatada,
-                data_baixada=data_download,
-                cpf=cpf
-            )
-            sessao.add(novo_contracheque)
-            sessao.commit()
-        return {'status': True}
+            matriculas_no_banco = sessao.query(Contracheque).filter_by(matricula=matricula['id']).first()
+            if not matriculas_no_banco:
+                contracheque = get_contracheque(cpf, mes, ano, matricula['id'])
+                data_referencia_formatada = datetime.strptime(f"{mes}-{ano}", "%m-%Y")
+                data_download = datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
+                novo_contracheque = Contracheque(
+                    imagem_contracheque=contracheque['imagem'],
+                    matricula=matricula['id'],
+                    data_referencia=data_referencia_formatada,
+                    data_baixada=data_download,
+                    cpf=cpf
+                )
+                sessao.add(novo_contracheque)
+                sessao.commit()
+                caminho_cc_pdf = decode_code(contracheque['imagem'], matricula['id'], mes, ano)
+                subprocess.Popen(['explorer', caminho_cc_pdf], shell=True)
+            else:
+                caminho_cc_pdf = decode_code(
+                    matriculas_no_banco.imagem_contracheque,
+                    matriculas_no_banco.matricula,
+                    mes,
+                    ano
+                )
+                subprocess.Popen(['explorer', caminho_cc_pdf], shell=True)
+        return True
     else:
-        return {'status': False}
+        return False
