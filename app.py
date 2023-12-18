@@ -44,7 +44,7 @@ def main(page: Page):
             page.title = 'Contra Cheque'
 
     page.on_route_change = router_change
-    page.go('/new_home')
+    page.go('/login')
 
 
 app(target=main, assets_dir='assets')

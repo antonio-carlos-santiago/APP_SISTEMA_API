@@ -5,12 +5,18 @@ from flet import *
 from root_app.pages import dados_de_acesso_autorizado
 
 
+def checkout():
+    try:
+        return datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
+    finally:
+        return datetime.now()
+
+
 class ContraCheque(UserControl):
     def __init__(self, page):
         super().__init__()
         self.page = page
-        self.dados_autorizados = dados_de_acesso_autorizado
-        self.data_atual = datetime.strptime(self.dados_autorizados['data_atual'], "%Y-%m-%d")
+        self.data_atual = checkout()
         self.formulario_cpf = TextField(
             hint_text='Insira o CPF',
             prefix_icon=icons.NUMBERS,
@@ -104,5 +110,3 @@ class ContraCheque(UserControl):
                 ]
             )
         )
-
-
