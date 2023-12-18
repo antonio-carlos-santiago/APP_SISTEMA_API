@@ -6,6 +6,7 @@ from view import views_handler
 def main(page: Page):
     page.window_resizable = False
     page.window_maximizable = False
+
     page.update()
 
     def router_change(route):

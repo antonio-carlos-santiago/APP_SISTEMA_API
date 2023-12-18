@@ -48,10 +48,11 @@ class Selecionado(Base):
 
 
 class Contracheque(Base):
-    __tablename__ = 'Contracheques'
+    __tablename__ = 'contracheques'
 
     id_contracheque = Column(Integer(), autoincrement=True, primary_key=True)
     imagem_contracheque = Column(String(), nullable=False)
     matricula = Column(String(), nullable=False)
+    cpf = Column(String, nullable=False)
     data_referencia = Column(Date, nullable=False)
     data_baixada = Column(Date, nullable=False)

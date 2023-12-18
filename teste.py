@@ -1,9 +1,32 @@
-from datetime import datetime
+import base64
 
-import flet as ft
-from flet import *
+from root_app import Contracheque
+from root_app.configuracoes.contracheques.elementos import buscar_cliente_cc
+from root_app.shared.database import SessionLocal
+
+import fitz
+
+sessao = SessionLocal()
+
+cliente = buscar_cliente_cc()
+contra_cheques_salvos = sessao.query(Contracheque).filter_by(cpf=cliente.cpf).first()
 
 
-from root_app.configuracoes.login.funcoes import ler_imagem
-dados_teste = {'vencimento': '2023-12-31', 'nome': 'antonio carlos santiago', 'nome_escritorio': 'iconnect', 'cpfoucnpf': 5303617360, 'telefone': '92984404584', 'email': 'carlos.santiago013@gmail.com', 'data_atual': '2023-12-13', 'link_foto_perfil': 'https://media-gru1-1.cdn.whatsapp.net/v/t61.24694-24/408285891_1733168760517763_5499078028534220565_n.jpg?ccb=11-4&oh=01_AdToDGA8UlT7OLf25ILvC-G1-JPBffJQNu3DIQpteZlqAQ&oe=6586D497&_nc_sid=e6ed6c&_nc_cat=109'}
+pdf_data = base64.b64decode(contra_cheques_salvos.imagem_contracheque)
+
+
+# 2. Salvar o PDF decodificado
+with open("output.pdf", "wb") as pdf_file:
+    pdf_file.write(pdf_data)
+
+with fitz.open('output.pdf') as pdf_document:
+    for page_number in range(pdf_document.page_count):
+        # Obtém a página do PDF
+        page = pdf_document[page_number]
+
+        # Cria uma imagem a partir da página
+        image = page.get_pixmap()
+
+        # Salva a imagem no formato PNG (ou em qualquer formato desejado)
+        image.save(f"{page_number + 1}.png")
 

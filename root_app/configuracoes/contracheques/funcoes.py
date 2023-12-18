@@ -1,8 +1,15 @@
 import base64
 import json
 import os
+from datetime import datetime
 
 import requests
+
+from root_app import Contracheque
+from root_app.pages import dados_de_acesso_autorizado
+from root_app.shared.database import SessionLocal
+
+sessao = SessionLocal()
 
 
 def decode_code(codigo, matricula, nome_cliente, mes, ano):
@@ -78,13 +85,24 @@ def get_contracheque(cpf, mes, ano, idproposta=None):
     return informacoes_servidor.json()
 
 
-def consulta(cpf, mes, ano, nome_cliente):
+def consulta(cpf, mes, ano):
     solicitacao = get_contracheque(cpf, mes, ano)
     autenticacao = verificar_retorno(solicitacao)
     if autenticacao:
         for matricula in solicitacao['contracheques']:
             contracheque = get_contracheque(cpf, mes, ano, matricula['id'])
-            decode_code(contracheque['imagem'], matricula['matricula'], nome_cliente, mes, ano)
+            print(contracheque['imagem'], type(contracheque['imagem']))
+            data_referencia_formatada = datetime.strptime(f"{mes}-{ano}", "%m-%Y")
+            data_download = datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
+            novo_contracheque = Contracheque(
+                imagem_contracheque=contracheque['imagem'],
+                matricula=matricula['id'],
+                data_referencia=data_referencia_formatada,
+                data_baixada=data_download,
+                cpf=cpf
+            )
+            sessao.add(novo_contracheque)
+            sessao.commit()
         return {'status': True}
     else:
         return {'status': False}

@@ -4,7 +4,7 @@ from root_app.pages.detalhes import Detalhes
 from root_app.pages.login import Login
 from root_app.pages.cliente import Cliente
 from root_app.pages.new_home import NewHome
-from root_app.pages.contracheque import ContraCheque
+
 
 
 def views_handler(page):
@@ -33,10 +33,4 @@ def views_handler(page):
                 NewHome(page)
             ]
         ),
-        '/contracheque': View(
-            route='/contracheque',
-            controls=[
-                ContraCheque(page)
-            ]
-        )
     }

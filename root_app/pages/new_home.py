@@ -11,12 +11,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
-from root_app.configuracoes.contracc.funcoes import consulta
 from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, consultar_margem, \
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado, URL_APP
+from root_app.pages.contracheque import ContraCheque
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -34,6 +34,7 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.aba_contracheque = ContraCheque(page)
         self.avisos_autenticacao = None
         self.botao_autenticacao = None
         self.dados_autenticados = dados_de_acesso_autorizado
@@ -62,11 +63,11 @@ class NewHome(UserControl):
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
 
-    def emitir_selecionado(self, botao: ControlEvent):
-        botao_string = str(botao.control)[10:]
-        botao_dicionario = ast.literal_eval(botao_string)
-        buscar_selecionado(botao_dicionario['key'])
-        self.page.go('/contracheque')
+    # def emitir_selecionado(self, botao: ControlEvent):
+    #     botao_string = str(botao.control)[10:]
+    #     botao_dicionario = ast.literal_eval(botao_string)
+    #     buscar_selecionado(botao_dicionario['key'])
+    #     self.page.go('/contracheque')
 
     def autentica(self, e):
         self.botao_autenticacao.disabled = True
@@ -168,8 +169,7 @@ class NewHome(UserControl):
                             horizontal_alignment=CrossAxisAlignment.CENTER,
                             alignment=MainAxisAlignment.CENTER,
                             controls=[
-                                Text(value="Ainda em desenvolvimento"),
-                                Text(value="Em breve poderá emitir contracheques com mais eficiencia")
+                                self.aba_contracheque
                             ]
                         )
 
@@ -394,7 +394,7 @@ class NewHome(UserControl):
                                     [
                                         Row([
                                             Text(value=f'Margem Emprestimo: {cliente.margem_emprestimo}'),
-                                            Text(value=f'Margem cartão: {cliente.margem_emprestimo}')
+                                            Text(value=f'Margem cartão: {cliente.margem_cartao}')
                                         ]),
                                         Text(f"CPF : {cliente.cpf}"),
                                         Text(f"Convenio : {cliente.convenio}"),
@@ -423,27 +423,12 @@ class NewHome(UserControl):
                                                                 on_click=self.deletar_consulta,
                                                                 key=str(cliente.id_consulta)
                                                             ),
-                                                            Text('Detalhes', size=10)
+                                                            Text('Del Cons', size=10)
                                                         ],
                                                         spacing=1,
                                                         alignment=MainAxisAlignment.CENTER,
                                                         key=str(cliente.id_consulta)
                                                     ),
-                                                    Column(
-                                                        controls=[
-                                                            IconButton(
-                                                                icon=icons.PRINT,
-                                                                icon_size=25,
-                                                                on_click=self.emitir_selecionado,
-                                                                key=str(cliente.id_consulta)
-
-                                                            ),
-                                                            Text('Imp CC', size=10)
-                                                        ],
-                                                        spacing=1,
-                                                        alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                                        key=str(cliente.id_consulta)
-                                                    )
                                                 ],
                                                 alignment=MainAxisAlignment.SPACE_AROUND),
                                             bgcolor='black',
