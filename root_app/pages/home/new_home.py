@@ -16,7 +16,8 @@ from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, 
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado, URL_APP
-from root_app.pages.contracheque import ContraCheque
+from root_app.pages.home.abas.autenticacao import Autenticacao
+from root_app.pages.home.abas.contracheque import ContraCheque
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -34,9 +35,8 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
+        self.aba_autenticacao = Autenticacao(page)
         self.aba_contracheque = ContraCheque(page)
-        self.avisos_autenticacao = None
-        self.botao_autenticacao = None
         self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
@@ -63,83 +63,6 @@ class NewHome(UserControl):
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
 
-    # def emitir_selecionado(self, botao: ControlEvent):
-    #     botao_string = str(botao.control)[10:]
-    #     botao_dicionario = ast.literal_eval(botao_string)
-    #     buscar_selecionado(botao_dicionario['key'])
-    #     self.page.go('/contracheque')
-
-    def autentica(self, e):
-        self.botao_autenticacao.disabled = True
-        self.update()
-        try:
-            url = f"{URL_APP}/sessao/nova-sessao"
-            options = Options()
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            service = Service()
-            options.add_argument('--start-maximized')
-            driver = webdriver.Chrome(service=service, options=options)
-            driver.implicitly_wait(30)
-            driver.get('https://nconsig.fenixsoft.com.br/Login.aspx')
-            while len(driver.find_elements(By.XPATH, '//*[@id="userLabel"]')) < 1:
-                sleep(1)
-            site = BeautifulSoup(driver.page_source, 'html.parser')
-            convenio = site.find('span', attrs={"id": "descricaoOrgaoLabel"}).text.split()
-            payload = json.dumps({
-                "sessao": driver.get_cookies()[0]['value'],
-                "convenio": convenio[0],
-                "email": dados_de_acesso_autorizado['email']
-            })
-            headers = {
-                'accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-            requests.request("PATCH", url, headers=headers, data=payload)
-            self.avisos_autenticacao.value = f"Parabens!!, o convenio {convenio[0]} foi autenticada com sucesso"
-
-        except:
-            self.avisos_autenticacao.value = "Não foi realizada nenhuma autenticação"
-
-        self.botao_autenticacao.disabled = False
-        self.update()
-
-    def tab_autenticacao(self):
-        self.botao_autenticacao = ElevatedButton(text='Autenticar Sessão', on_click=self.autentica, height=60)
-        self.avisos_autenticacao = Text()
-        return Column(
-            horizontal_alignment=CrossAxisAlignment.CENTER,
-            controls=[
-                Container(
-                    height=30,
-                    width=20
-                ),
-                Row(
-                    alignment=MainAxisAlignment.SPACE_AROUND,
-                    controls=[
-                        Checkbox(label='Fenix', value=True, disabled=True),
-                        Checkbox(label='Consiglog', value=False, disabled=True)
-                    ]
-                ),
-                Container(
-                    height=20,
-                    width=20
-                ),
-                Row(
-                    alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        self.botao_autenticacao
-                    ]
-                ),
-                Row(
-                    alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        self.avisos_autenticacao
-                    ]
-                )
-            ]
-        )
-
     def elementos_tab(self):
         data_vencimento = datetime.strptime(self.dados_autenticados["vencimento"], "%Y-%m-%d")
         data_atual = datetime.strptime(self.dados_autenticados["data_atual"], "%Y-%m-%d")
@@ -157,7 +80,7 @@ class NewHome(UserControl):
                         width=200,
                         height=600,
                         border_radius=10,
-                        content=self.tab_autenticacao()
+                        content=self.aba_autenticacao
                     )
                     ),
                 Tab(text='Emitir CC',
@@ -268,7 +191,6 @@ class NewHome(UserControl):
         self.avisos_adicionais.visible = False
         self.formulario_cpf.error_text = None
         self.lista_convenio.error_text = None
-        self.avisos_autenticacao.value = None
         self.update()
 
     def botao_selecionado(self, botao: ControlEvent):

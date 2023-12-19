@@ -16,7 +16,7 @@ from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, 
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado, URL_APP
-from root_app.pages.contracheque import ContraCheque
+from root_app.pages.home.abas.contracheque import ContraCheque
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
