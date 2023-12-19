@@ -8,10 +8,7 @@ from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, 
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado
-from root_app.pages.home.abas.autenticacao import Autenticacao
-from root_app.pages.home.abas.contracheque import ContraCheque
-from root_app.pages.home.abas.indefinido import Indefinido
-from root_app.pages.home.abas.perfil import Perfil
+from root_app.pages.home.abas.abas_gerais import AbaFather
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -29,11 +26,7 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
-        self.aba_autenticacao = Autenticacao(page)
-        self.aba_contracheque = ContraCheque(page)
-        self.aba_higienizar = Indefinido(page)
-        self.aba_perfil = Perfil(page)
-        self.aba_pagamentos = Indefinido(page)
+        self.abas = AbaFather(page)
         self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
@@ -59,39 +52,6 @@ class NewHome(UserControl):
         self.page.overlay.append(self.calendario)
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
-
-    def elementos_tab(self):
-        tabelas = Tabs(
-            selected_index=0,
-            animation_duration=300,
-            width=200,
-            height=600,
-            label_color=self.cor_do_botao,
-            indicator_border_radius=10,
-            tabs=[
-                Tab(
-                    text="Autenticação",
-                    content=self.aba_autenticacao),
-                Tab(
-                    text='Emitir CC',
-                    content=self.aba_contracheque
-                    ),
-                Tab(
-                    text="Higielizar",
-                    content=self.aba_higienizar
-                ),
-                Tab(
-                    text='Perfil',
-                    content=self.aba_perfil
-                ),
-                Tab(
-                    text='Pagamentos',
-                    content=self.aba_pagamentos
-                ),
-            ]
-        )
-
-        return tabelas
 
     def buscar_margem(self, e):
         data_vencimento = datetime.strptime(dados_de_acesso_autorizado['vencimento'], "%Y-%m-%d")
@@ -379,7 +339,7 @@ class NewHome(UserControl):
             height=300,
             border_radius=15,
             padding=padding.only(right=20, left=20, bottom=20),
-            content=self.elementos_tab(),
+            content=self.abas,
             on_hover=self.trata_erros
         )
 
