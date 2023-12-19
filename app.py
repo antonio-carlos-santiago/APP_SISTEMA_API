@@ -9,7 +9,7 @@ def main(page: Page):
 
     page.update()
 
-    def router_change(route):
+    def router_change(e):
         page.views.clear()
         page.views.append(
             views_handler(page)[page.route]
