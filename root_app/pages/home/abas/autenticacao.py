@@ -50,10 +50,15 @@ class Autenticacao(UserControl):
             }
             requests.request("PATCH", url, headers=headers, data=payload)
             self.avisos_autenticacao.value = f"Parabens!!, o convenio {convenio[0]} foi autenticada com sucesso"
+            self.update()
+            sleep(5)
 
         except:
             self.avisos_autenticacao.value = "Não foi realizada nenhuma autenticação"
+            self.update()
+            sleep(5)
 
+        self.avisos_autenticacao.value = ""
         self.botao_autenticacao.disabled = False
         self.update()
 

@@ -1,23 +1,16 @@
 import ast
-import json
 from datetime import datetime, timedelta
-from time import sleep
 
-import requests
-from bs4 import BeautifulSoup
 from flet import *
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 
 from root_app.configuracoes.home.funcoes import buscar_selecionado, valida_cpf, consultar_margem, \
     salvar_dados_retornados, deletar_consulta
 from root_app.configuracoes.home.models import Consulta
 from root_app.configuracoes.login.funcoes import ler_imagem
-from root_app.pages import dados_de_acesso_autorizado, URL_APP
+from root_app.pages import dados_de_acesso_autorizado
 from root_app.pages.home.abas.autenticacao import Autenticacao
 from root_app.pages.home.abas.contracheque import ContraCheque
+from root_app.pages.home.abas.perfil import Perfil
 from root_app.shared.database import SessionLocal
 
 session = SessionLocal()
@@ -37,6 +30,8 @@ class NewHome(UserControl):
         super().__init__()
         self.aba_autenticacao = Autenticacao(page)
         self.aba_contracheque = ContraCheque(page)
+        self.aba_perfil = Perfil(page)
+        self.aba_pagamentos = None
         self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
@@ -64,9 +59,6 @@ class NewHome(UserControl):
         self.adiciona_elemento(datetime.today())
 
     def elementos_tab(self):
-        data_vencimento = datetime.strptime(self.dados_autenticados["vencimento"], "%Y-%m-%d")
-        data_atual = datetime.strptime(self.dados_autenticados["data_atual"], "%Y-%m-%d")
-        vencimento = data_vencimento - data_atual
         tabelas = Tabs(
             selected_index=0,
             animation_duration=300,
@@ -75,74 +67,24 @@ class NewHome(UserControl):
             label_color=self.cor_do_botao,
             indicator_border_radius=10,
             tabs=[
-                Tab(text="Autenticação",
-                    content=Container(
-                        width=200,
-                        height=600,
-                        border_radius=10,
-                        content=self.aba_autenticacao
-                    )
+                Tab(
+                    text="Autenticação",
+                    content=self.aba_autenticacao),
+                Tab(
+                    text='Emitir CC',
+                    content=self.aba_contracheque
                     ),
-                Tab(text='Emitir CC',
-                    content=Container(
-                        width=200,
-                        height=600,
-                        border_radius=10,
-                        content=Column(
-                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                            alignment=MainAxisAlignment.CENTER,
-                            controls=[
-                                self.aba_contracheque
-                            ]
-                        )
-
-                    )),
-                Tab(text='Perfil',
-                    content=Container(
-                        width=200,
-                        height=600,
-                        border_radius=10,
-                        content=Column(
-                            controls=[
-                                Row(
-                                    # alignment=MainAxisAlignment.START,
-                                    controls=[
-                                        CircleAvatar(foreground_image_url=self.dados_autenticados['link_foto_perfil'],
-                                                     width=50, height=50),
-                                        Column(
-                                            controls=[
-                                                Text(value=f'Nome: {self.dados_autenticados["nome"].title()}'),
-                                                Text(
-                                                    value=f"Empresa: {self.dados_autenticados['nome_escritorio'].title()}")
-                                            ]
-                                        ),
-                                    ]
-                                ),
-                                Divider(),
-                                Text(value=f"Valído até: {data_vencimento.strftime('%d/%m/%Y')}"),
-                                Text(value=f"Dias Restante: {vencimento.days} dias"),
-                                Text(value=f"Email: {self.dados_autenticados['email']}"),
-                                Text(value=f"Telefone: {self.dados_autenticados['telefone']}")
-
-                            ]
-                        )
-                    )
-                    ),
-                Tab(text='Pagamentos',
-                    content=Container(
-                        width=200,
-                        height=600,
-                        border_radius=10,
-                        content=Column(
-                            horizontal_alignment=CrossAxisAlignment.CENTER,
-                            alignment=MainAxisAlignment.CENTER,
-                            controls=[
-                                Text(value="Ainda em desenvolvimento"),
-                                Text(value="Em breve hávera meios de pagamentos disponiveis :)")
-                            ]
-                        )
-                    )
-                    ),
+                Tab(
+                    text="Higielizar"
+                ),
+                Tab(
+                    text='Perfil',
+                    content=self.aba_perfil
+                ),
+                Tab(
+                    text='Pagamentos',
+                    content=self.aba_pagamentos
+                ),
             ]
         )
 
