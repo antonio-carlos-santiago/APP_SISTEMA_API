@@ -26,9 +26,19 @@ class NewHome(UserControl):
 
     def __init__(self, page):
         super().__init__()
-        self.abas = AbaFather(page)
+        self.page = page
+        self.cor_conteiner = '#696969'
+        self.cor_do_botao = '#800000'
         self.dados_autenticados = dados_de_acesso_autorizado
-        self.conteiner_autenticacao = None
+        self.abas = AbaFather(self.page)
+        self.conteiner_autenticacao = Container(
+            bgcolor=self.cor_conteiner,
+            width=500,
+            height=300,
+            border_radius=15,
+            padding=padding.only(right=20, left=20, bottom=20),
+        )
+
         self.coluna_scroll = Column(
             scroll=ScrollMode.ALWAYS,
             auto_scroll=True,
@@ -45,9 +55,8 @@ class NewHome(UserControl):
         self.lista_convenio = None
         self.botao_busca = None
         self.formulario_cpf = None
-        self.page = page
-        self.cor_conteiner = '#696969'
-        self.cor_do_botao = '#800000'
+
+
         self.calendario = calendario()
         self.page.overlay.append(self.calendario)
         self.calendario.on_change = self.change_date
@@ -321,6 +330,7 @@ class NewHome(UserControl):
         return elementos
 
     def build(self):
+        self.conteiner_autenticacao.content = self.abas
 
         conteiner_pesquisa = Container(
             bgcolor=self.cor_conteiner,
@@ -333,15 +343,7 @@ class NewHome(UserControl):
 
         )
 
-        self.conteiner_autenticacao = Container(
-            bgcolor=self.cor_conteiner,
-            width=500,
-            height=300,
-            border_radius=15,
-            padding=padding.only(right=20, left=20, bottom=20),
-            content=self.abas,
-            on_hover=self.trata_erros
-        )
+
 
         conteiner_titulo_cliente = Container(
             bgcolor=self.cor_conteiner,
