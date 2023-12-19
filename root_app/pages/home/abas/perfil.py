@@ -26,9 +26,9 @@ class Perfil(UserControl):
             data_vencimento = datetime.strptime(self.dados_autenticados["vencimento"], "%Y-%m-%d")
             data_atual = datetime.strptime(self.dados_autenticados["data_atual"], "%Y-%m-%d")
             vencimento = data_vencimento - data_atual
-            self.nome.value = f'Nome: {self.dados_autenticados["nome"]}'
+            self.nome.value = f'Nome: {self.dados_autenticados["nome"].title()}'
             self.foto_perfil.foreground_image_url = self.dados_autenticados["link_foto_perfil"],
-            self.empresa.value = f"Empresa: {self.dados_autenticados['nome_escritorio']}"
+            self.empresa.value = f"Empresa: {self.dados_autenticados['nome_escritorio'].title()}"
             self.email.value = f"Email: {self.dados_autenticados['email']}"
             self.telefone.value = f"Telefone: {self.dados_autenticados['telefone']}"
             self.validade.value = f"Valído até: {data_vencimento.strftime('%d/%m/%Y')}"

@@ -9,6 +9,7 @@ from root_app.pages import dados_de_acesso_autorizado
 class Pesquisas(UserControl):
     def __init__(self, page):
         super().__init__()
+        self.acesso_autorizado = dados_de_acesso_autorizado
         self.cor_conteiner = '#696969'
         self.cor_do_botao = '#800000'
         self.page = page
@@ -56,15 +57,20 @@ class Pesquisas(UserControl):
 
         )
 
-        self.barra_de_carregamento = Row([Icon(name=icons.FIND_IN_PAGE),
-                                          ProgressBar(
-                                              color="#8B0000",
-                                              bgcolor="#778899",
-                                              width=420,
-                                              height=20,
-
-                                          )],
-                                         visible=False)
+        self.barra_de_carregamento = Row(
+            visible=False,
+            controls=[
+                Icon(
+                    name=icons.FIND_IN_PAGE
+                ),
+                ProgressBar(
+                    color="#8B0000",
+                    bgcolor="#778899",
+                    width=420,
+                    height=20
+                )
+            ],
+        )
 
         self.avisos_adicionais = Text(
             value='Consulta Realizada com Sucesso!!',
@@ -82,8 +88,8 @@ class Pesquisas(UserControl):
         self.update()
 
     def buscar_margem(self, e):
-        data_vencimento = datetime.strptime(dados_de_acesso_autorizado['vencimento'], "%Y-%m-%d")
-        data_servidor = datetime.strptime(dados_de_acesso_autorizado['data_atual'], "%Y-%m-%d")
+        data_vencimento = datetime.strptime(self.acesso_autorizado['vencimento'], "%Y-%m-%d")
+        data_servidor = datetime.strptime(self.acesso_autorizado['data_atual'], "%Y-%m-%d")
         if data_vencimento >= data_servidor:
             cpf = valida_cpf(self.formulario_cpf.value)
             if self.lista_convenio.value == 'Selecione o Convenio':
@@ -122,37 +128,51 @@ class Pesquisas(UserControl):
         self.formulario_cpf.on_change = self.trata_erros
         self.lista_convenio.on_change = self.trata_erros
         return Column(
-            [
-                Row([
-                    self.formulario_cpf,
-                ],
-                    alignment=MainAxisAlignment.CENTER
+            alignment=MainAxisAlignment.CENTER,
+            controls=[
+                Row(
+                    alignment=MainAxisAlignment.CENTER,
+                    controls=[
+                        self.formulario_cpf,
+                    ],
                 ),
-                Row([
-                    self.lista_convenio,
-                ],
-                    alignment=MainAxisAlignment.CENTER
+                Row(
+                    alignment=MainAxisAlignment.CENTER,
+                    controls=[
+                        self.lista_convenio,
+                    ],
                 ),
                 Container(
+                    alignment=alignment.center,
                     width=20,
                     height=30,
-                    content=Column([
-                        Row([self.avisos_adicionais]),
-                        Row([self.barra_de_carregamento],
-                            alignment=MainAxisAlignment.CENTER),
-
-                    ],
-                        alignment=MainAxisAlignment.CENTER),
-                    alignment=alignment.center
-                ),
-                Column([
-                    Row([
-                        self.botao_busca
-                    ],
-                        alignment=MainAxisAlignment.CENTER
+                    content=Column(
+                        alignment=MainAxisAlignment.CENTER,
+                        controls=[
+                            Row(
+                                controls=[
+                                    self.avisos_adicionais
+                                ]
+                            ),
+                            Row(
+                                alignment=MainAxisAlignment.CENTER,
+                                controls=[
+                                    self.barra_de_carregamento
+                                ]
+                            ),
+                        ],
                     ),
-                ],
-                    alignment=MainAxisAlignment.CENTER)
-            ], alignment=MainAxisAlignment.CENTER
+                ),
+                Column(
+                    alignment=MainAxisAlignment.CENTER,
+                    controls=[
+                        Row(
+                            alignment=MainAxisAlignment.CENTER,
+                            controls=[
+                                self.botao_busca
+                            ]
+                        )
+                    ]
+                )
+            ]
         )
-

@@ -71,8 +71,6 @@ class NewHome(UserControl):
         self.calendario.on_change = self.change_date
         self.adiciona_elemento(datetime.today())
 
-
-
     def botao_selecionado(self, botao: ControlEvent):
         botao_string = str(botao.control)[10:]
         botao_dicionario = ast.literal_eval(botao_string)

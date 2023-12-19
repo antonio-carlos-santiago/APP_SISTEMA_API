@@ -5,7 +5,7 @@ dados_de_acesso_autorizado = {
   "nome": "antonio carlos santiago",
   "nome_escritorio": "iconect",
   "cpfoucnpf": 5303617360,
-  "vencimento": "2024-12-31",
+  "vencimento": "2024-12-18",
   "telefone": "95981207039",
   "email": "carlos.santiago013@gmail.com",
   "data_atual": "2023-12-19",
