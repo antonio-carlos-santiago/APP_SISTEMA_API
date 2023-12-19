@@ -10,6 +10,7 @@ from root_app.configuracoes.login.funcoes import ler_imagem
 from root_app.pages import dados_de_acesso_autorizado
 from root_app.pages.home.abas.autenticacao import Autenticacao
 from root_app.pages.home.abas.contracheque import ContraCheque
+from root_app.pages.home.abas.indefinido import Indefinido
 from root_app.pages.home.abas.perfil import Perfil
 from root_app.shared.database import SessionLocal
 
@@ -30,8 +31,9 @@ class NewHome(UserControl):
         super().__init__()
         self.aba_autenticacao = Autenticacao(page)
         self.aba_contracheque = ContraCheque(page)
+        self.aba_higienizar = Indefinido(page)
         self.aba_perfil = Perfil(page)
-        self.aba_pagamentos = None
+        self.aba_pagamentos = Indefinido(page)
         self.dados_autenticados = dados_de_acesso_autorizado
         self.conteiner_autenticacao = None
         self.coluna_scroll = Column(
@@ -75,7 +77,8 @@ class NewHome(UserControl):
                     content=self.aba_contracheque
                     ),
                 Tab(
-                    text="Higielizar"
+                    text="Higielizar",
+                    content=self.aba_higienizar
                 ),
                 Tab(
                     text='Perfil',
